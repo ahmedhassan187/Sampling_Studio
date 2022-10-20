@@ -48,18 +48,18 @@ with st.sidebar:
     generate_expander = st.sidebar.expander(
         "Generate/Add Signal ", expanded=False)
     Label = generate_expander.text_input("Label")
-    frecq = generate_expander.text_input("Frecquency in Hz")
-    Amplitude = generate_expander.text_input("Amplitude")
+    freq = generate_expander.number_input("Frecquency in Hz")
+    Amplitude = generate_expander.number_input("Amplitude")
     Add_button_clicked = generate_expander.button("Save", key=1)
 
     if Add_button_clicked:
         get_data().append(
-            {"Label": Label, "Frecquency in Hz": frecq, "Amplitude": Amplitude})
+            {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
     Signals = pd.DataFrame(get_data())
     st.write(Signals)
 
-    delet_button = st.button('Delete A signal')
-    if delet_button:
+    delete_button = st.button('Delete A signal')
+    if delete_button:
         Deleted_Signal = st.number_input(
             "Enter the row of the Signal", min_value=0,max_value=5)    
         logic.remove_Signal(Deleted_Signal,Signals)
