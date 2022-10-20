@@ -57,17 +57,15 @@ with st.sidebar:
             {"Label": Label, "Frecquency in Hz": frecq, "Amplitude": Amplitude})
     Signals = pd.DataFrame(get_data())
     st.write(Signals)
-    list_sig = [1,2,3,4]
+
     delet_button = st.button('Delete A signal')
     if delet_button:
         Deleted_Signal = st.number_input(
-            "Enter the row of the Signal", min_value=0,max_value=5)
-        print(Deleted_Signal)    
-        # logic.remove_Signal(Deleted_Signal,list_sig)
-    
+            "Enter the row of the Signal", min_value=0,max_value=5)    
+        logic.remove_Signal(Deleted_Signal,Signals)
         # Signals.drop([Deleted_Signal], axis=0, inplace=True)
     # st.write(Signals)
-    print(list_sig)
+
     st.write("")
 
     if st.button(" Upload a Signal"):
