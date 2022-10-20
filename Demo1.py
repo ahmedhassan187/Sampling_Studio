@@ -34,7 +34,7 @@ def local_css(file_name):
 local_css("style.css")
 
 
-st.title(" Welcom to Sampling Studio")
+st.title(" Welcome to Sampling Studio")
 
 
 @st.cache(allow_output_mutation=True)
@@ -72,6 +72,11 @@ with st.sidebar:
 
         file = st.file_uploader("Upload Your Signal")
         Data = pd.read_csv(file)
-    st.slider('Add Noise', 0, 100)
+    
+    if st.checkbox("Add Noise") :
+        st.slider("SNR",0, 100, step= 1)
 
     st.button("Save")
+
+
+st.slider("Sample Rate", 0, 300, step= 2)
