@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sys
-from streamlit_option_menu import option_menu
+# from streamlit_option_menu import option_menu
 from scipy.misc import electrocardiogram
 import matplotlib.pyplot as plt
 import time
