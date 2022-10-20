@@ -61,8 +61,8 @@ with st.sidebar:
     delet_button = st.button('Delete A signal')
     if delet_button:
         Deleted_Signal = st.number_input(
-            "Enter the row of the Signal", min_value=0,max_value=5)    
-        logic.remove_Signal(Deleted_Signal,Signals)
+            "Enter the row of the Signal", min_value=0,max_value=5)
+        logic.remove_Signal(int(Deleted_Signal),get_data())
         # Signals.drop([Deleted_Signal], axis=0, inplace=True)
     # st.write(Signals)
 

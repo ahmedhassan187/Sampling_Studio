@@ -7,4 +7,4 @@ class logic:
         result = magnitude*np.sin(2*np.pi*time*frequency)
         logic.signals_List.append(result)
     def remove_Signal(index,signal_list):
-        signal_list.remove(index)
+        del signal_list[index]
