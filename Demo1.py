@@ -9,6 +9,9 @@ from scipy.misc import electrocardiogram
 import matplotlib.pyplot as plt
 import time
 from collections import namedtuple, defaultdict
+import mpld3
+import streamlit.components.v1 as components
+
 st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(
     page_title='Sampling Studio',
@@ -41,6 +44,7 @@ st.title(" Welcome to Sampling Studio")
 def get_data():
     return []
 
+fig= plt.figure()
 
 with st.sidebar:
 
@@ -48,11 +52,16 @@ with st.sidebar:
     generate_expander = st.sidebar.expander(
         "Generate/Add Signal ", expanded=False)
     Label = generate_expander.text_input("Label")
-    freq = generate_expander.number_input("Frecquency in Hz")
-    Amplitude = generate_expander.number_input("Amplitude")
+    freq = generate_expander.number_input("Frecquency in Hz", step = 1)
+    Amplitude = generate_expander.number_input("Amplitude", step = 1)
     Add_button_clicked = generate_expander.button("Save", key=1)
 
     if Add_button_clicked:
+        logic.add_signals(Amplitude, freq) 
+        # sum = []
+        sum = logic.sum_signals()
+        print(sum)
+
         get_data().append(
             {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
     Signals = pd.DataFrame(get_data())
@@ -61,20 +70,33 @@ with st.sidebar:
     delete_button = st.button('Delete A signal')
     if delete_button:
         Deleted_Signal = st.number_input(
-            "Enter the row of the Signal", min_value=0,max_value=5)
+            "Enter the row of the Signal", step = 1)
         logic.remove_Signal(int(Deleted_Signal),get_data())
         # Signals.drop([Deleted_Signal], axis=0, inplace=True)
+
+        # del st.session_state.y[Deleted_Signal]
+        # del st.session_state.amp[Deleted_Signal]
+        # del st.session_state.freq[Deleted_Signal]
+
+        # # logic.delete_Signal(Deleted_Signal)  
+        # # for m in range (0,len(st.session_state.y)):
+        # #     st.session_state.y[Deleted_Signal] = st.session_state.y[Deleted_Signal+1]
+
+        # # st.session_state.y[len(st.session_state.y)] -= 1
+        # # len(st.session_state.y) = len(st.session_state.y) -1   
     # st.write(Signals)
 
     st.write("")
 
     if st.button(" Upload a Signal"):
-
         file = st.file_uploader("Upload Your Signal")
         Data = pd.read_csv(file)
     
     if st.checkbox("Add Noise") :
-        st.slider("SNR",0, 100, step= 1)
+        snr = st.slider("SNR",0, 100, step= 1)
+        # noised_signal = 0
+        # # signalll = sum**2
+        noised_signal = logic.add_noise(sum,snr)
 
     st.button("Save")
 
