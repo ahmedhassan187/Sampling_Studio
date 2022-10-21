@@ -80,6 +80,7 @@ with st.sidebar:
 
 frequency = st.slider("Freq",1,300,step=1)
 sample_rate = st.slider("Sample Rate", 1, 300, step= 1)
+print(sample_rate)
 y = logic.sinc_Interpolation(sample_rate,frequency)
 plt.subplot(211)
 plt.plot(logic.time,np.sin(2*np.pi*frequency*logic.time))
