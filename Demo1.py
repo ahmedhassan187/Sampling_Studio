@@ -9,7 +9,7 @@ from scipy.misc import electrocardiogram
 import matplotlib.pyplot as plt
 import time
 from collections import namedtuple, defaultdict
-
+st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(
     page_title='Sampling Studio',
     page_icon="chart_with_upwards_trend",
@@ -78,5 +78,11 @@ with st.sidebar:
 
     st.button("Save")
 
-
-st.slider("Sample Rate", 0, 300, step= 2)
+frequency = st.slider("Freq",1,300,step=1)
+sample_rate = st.slider("Sample Rate", 1, 300, step= 1)
+y = logic.sinc_Interpolation(sample_rate,frequency)
+plt.subplot(211)
+plt.plot(logic.time,np.sin(2*np.pi*frequency*logic.time))
+plt.subplot(212)
+plt.plot(logic.time,y)
+st.pyplot()
