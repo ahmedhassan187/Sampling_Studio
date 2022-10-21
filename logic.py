@@ -4,17 +4,17 @@ import scipy
 from scipy import signal
 import streamlit as st
 
-if 'i' not in st.session_state:
-    st.session_state.i = 0
-
-if 'y' not in st.session_state:
-    st.session_state.y = []
+if 'sinW' not in st.session_state:
+    st.session_state.sinW = []
 
 if 'amp' not in st.session_state:
     st.session_state.amp = []
 
 if 'freq' not in st.session_state:
     st.session_state.freq = []   
+
+if 'sum' not in st.session_state:
+    st.session_state.sum = 0
 
 class logic:
     time = np.linspace(0,1,200)
@@ -26,6 +26,9 @@ class logic:
 
     def remove_Signal(index,signal_list):
         del signal_list[index]
+        del st.session_state.sinW[index]
+        del st.session_state.amp[index]
+        del st.session_state.freq[index]
 
     def sampling(sample_Frequency,signal_Frequency):
         T = 1/sample_Frequency
@@ -52,28 +55,26 @@ class logic:
     def add_signals(amplitude, frequency):
         st.session_state.amp.append(amplitude)
         st.session_state.freq.append(frequency)
-        st.session_state.y.append(amplitude*np.sin(2 * np.pi * frequency * time ))
+        st.session_state.sinW.append(amplitude*np.sin(2 * np.pi * frequency * logic.time ))
         # st.session_state.i +=1
 
     def sum_signals():
-        l = 0
+        sum = 0
         # for i in range (0,len(st.session_state.y)):
         #     # print(i)
-        #     l = l + st.session_state.y[i]
+        #     sum = sum + st.session_state.y[i]
         for i in range (0,len(st.session_state.amp)):
-            l = l + st.session_state.amp[i]*np.sin(2*np.pi * st.session_state.freq[i]*time)
-        return l
+            sum = sum + st.session_state.amp[i]*np.sin(2*np.pi * st.session_state.freq[i]*logic.time)
+        return sum
 
-    def delete_Signal(i):
-        st.session_state.y[i] = st.session_state.y[i+1]
-        st.session_state.y[len(st.session_state.y)-1] = 0
-        # st.session_state.y.(len(st.session_state.y)) -=1 
-        # st.session_state.Signal[m] = st.session_state.Signal[m+1]    
-        # st.session_state.Signal[len(st.session_state.Signal)-1] = 0
-        # st.session_state.Signal[len(st.session_state.Signal)] -=1 
+    # def delete_Signal(i):
+
 
     def get_maxF():
-        maxF = max(st.session_state.freq)
+        if len(st.session_state.freq) ==0:
+            maxF =0
+        else:    
+            maxF = max(st.session_state.freq)
         return maxF    
 
     def add_noise(target_Sig,snr_db):

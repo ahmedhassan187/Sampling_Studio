@@ -57,32 +57,23 @@ with st.sidebar:
     Add_button_clicked = generate_expander.button("Save", key=1)
 
     if Add_button_clicked:
-        # logic.add_signals(Amplitude, freq) 
-        # sum = logic.sum_signals()
+        logic.add_signals(Amplitude, freq) 
+        st.session_state.sum = logic.sum_signals()
 
         get_data().append(
             {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
     Signals = pd.DataFrame(get_data())
     st.write(Signals)
 
+    Deleted_Signal = st.number_input(
+            "Enter the row of the Signal", step = 1)
     delete_button = st.button('Delete A signal')
     if delete_button:
-        Deleted_Signal = st.number_input(
-            "Enter the row of the Signal", step = 1)
+        
         logic.remove_Signal(int(Deleted_Signal),get_data())
-        # Signals.drop([Deleted_Signal], axis=0, inplace=True)
-
-        # del st.session_state.y[Deleted_Signal]
-        # del st.session_state.amp[Deleted_Signal]
-        # del st.session_state.freq[Deleted_Signal]
-
-        # # logic.delete_Signal(Deleted_Signal)  
-        # # for m in range (0,len(st.session_state.y)):
-        # #     st.session_state.y[Deleted_Signal] = st.session_state.y[Deleted_Signal+1]
-
-        # # st.session_state.y[len(st.session_state.y)] -= 1
-        # # len(st.session_state.y) = len(st.session_state.y) -1   
-    # st.write(Signals)
+        Signals.drop([Deleted_Signal], axis=0, inplace=True)
+ 
+        st.session_state.sum = logic.sum_signals() 
 
     st.write("")
 
@@ -92,16 +83,28 @@ with st.sidebar:
     
     if st.checkbox("Add Noise") :
         snr = st.slider("SNR",0, 100, step= 1)
-        # noised_signal = logic.add_noise(sum,snr)
+        noised_signal = logic.add_noise(st.session_state.sum, snr)
 
     st.button("Save")
 
 frequency = st.slider("Freq",1,300,step=1)
 sample_rate = st.slider("Sample Rate", 1, 300, step= 1)
 print(sample_rate)
-y = logic.sinc_Interpolation(sample_rate,frequency)
+maxF = logic.get_maxF()
+
+# y = logic.sinc_Interpolation(sample_rate,maxF)
+# plt.subplot(211)
+# plt.plot(logic.time,st.session_state.sum)
+# plt.subplot(212)
+# plt.plot(logic.time,y)
+# st.pyplot()
+
+
+# y = logic.sinc_Interpolation(sample_rate,maxF)
+# for i in range(0, len(st.session_state.sinW)):
 plt.subplot(211)
-plt.plot(logic.time,np.sin(2*np.pi*frequency*logic.time))
+plt.plot(logic.time,noised_signal)
+
 plt.subplot(212)
-plt.plot(logic.time,y)
+plt.plot(logic.time,st.session_state.sum)
 st.pyplot()
