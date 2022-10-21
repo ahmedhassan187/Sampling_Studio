@@ -57,10 +57,8 @@ with st.sidebar:
     Add_button_clicked = generate_expander.button("Save", key=1)
 
     if Add_button_clicked:
-        logic.add_signals(Amplitude, freq) 
-        # sum = []
-        sum = logic.sum_signals()
-        print(sum)
+        # logic.add_signals(Amplitude, freq) 
+        # sum = logic.sum_signals()
 
         get_data().append(
             {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
@@ -94,9 +92,7 @@ with st.sidebar:
     
     if st.checkbox("Add Noise") :
         snr = st.slider("SNR",0, 100, step= 1)
-        # noised_signal = 0
-        # # signalll = sum**2
-        noised_signal = logic.add_noise(sum,snr)
+        # noised_signal = logic.add_noise(sum,snr)
 
     st.button("Save")
 
