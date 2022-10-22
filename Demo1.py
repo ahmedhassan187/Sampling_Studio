@@ -45,7 +45,7 @@ def get_data():
 
 
 fig = plt.figure()
-
+flag_noised = False
 with st.sidebar:
 
     st.title(':gear: Sampling Studio')
@@ -97,10 +97,10 @@ with st.sidebar:
         Data = pd.read_csv(file)
 
     if st.checkbox("Add Noise"):
-
         snr = st.slider("SNR", 0, 100, step=1)
         noised_signal = logic.add_noise(st.session_state.sum, snr)
-
+        flag_noised = True
+        # st.session_state.sum = noised_signal
     generate_expander_save = st.sidebar.expander(
         "Save Signal", expanded=False)
     Folder_Name = generate_expander_save.text_input("Folder Name")
@@ -112,10 +112,25 @@ sample_rate = st.slider("Sample Rate", 1, 5, step=1)
 maxF = logic.get_maxF()
 # y = logic.sinc_Interpolation(sample_rate,maxF)
 # for i in range(0, len(st.session_state.sinW)):
-if type(st.session_state.sum) is np.ndarray:
-    y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF())
-    plt.subplot(211)
-    plt.plot(logic.time, y_new)
-    plt.subplot(212)
-    plt.plot(logic.time, st.session_state.sum)
+if file is None:
+    if type(st.session_state.sum) is  np.ndarray :
+      if flag_noised:
+        y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF(),noised_signal)
+        plt.subplot(211)
+        plt.plot(logic.time,y_new)
+        plt.subplot(212)
+        plt.plot(logic.time,noised_signal)  
+      else:
+        y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF(),st.session_state.sum)
+        plt.subplot(211)
+        plt.plot(logic.time,(y_new))
+        plt.subplot(212)
+        plt.plot(logic.time,st.session_state.sum)
+else:
+        x,y,z = logic.open_File(file)
+        y_new = logic.sinc_Interpolation(sample_rate*z,y)
+        plt.subplot(211)
+        plt.plot(x,y_new)
+        plt.subplot(212)
+        plt.plot(x,y)
 st.pyplot()
