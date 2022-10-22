@@ -1,4 +1,3 @@
-from tkinter import Y, Label
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,13 +5,11 @@ import sys
 
 from traitlets import default
 from logic import logic
-# from streamlit_option_menu import option_menu
-from scipy.misc import electrocardiogram
 import matplotlib.pyplot as plt
 import time
-from collections import namedtuple, defaultdict
+# from collections import namedtuple, defaultdict
 import mpld3
-import streamlit.components.v1 as components
+# import streamlit.components.v1 as components
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(
@@ -68,7 +65,7 @@ with st.sidebar:
         get_data().append(
             {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
     Signals = pd.DataFrame(get_data())
-    st.write(Signals)
+    # st.write(Signals)
 
     generate_expander_Delete = st.sidebar.expander(
         "Delete a Signal ", expanded=False)
@@ -87,6 +84,10 @@ with st.sidebar:
                 st.session_state.sum = 0
             else:
                 st.session_state.sum = logic.sum_signals()
+    if Signals.empty:
+        st.write("")
+    else:
+        st.write(Signals)
 
     st.write("")
     generate_expander_Upload = st.sidebar.expander(
