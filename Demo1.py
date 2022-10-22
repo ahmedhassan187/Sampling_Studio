@@ -69,11 +69,13 @@ with st.sidebar:
             "Enter the row of the Signal", step = 1)
     delete_button = st.button('Delete A signal')
     if delete_button:
-        
-        logic.remove_Signal(int(Deleted_Signal),get_data())
-        Signals.drop([Deleted_Signal], axis=0, inplace=True)
- 
-        st.session_state.sum = logic.sum_signals() 
+        if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0  :
+            st.text("Invalid number")
+        else :
+            logic.remove_Signal(int(Deleted_Signal),get_data())
+            Signals.drop([Deleted_Signal], axis=0, inplace=True)
+    
+            st.session_state.sum = logic.sum_signals() 
 
     st.write("")
 
