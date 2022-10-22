@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sys
-
 from traitlets import default
 from logic import logic
 import matplotlib.pyplot as plt
@@ -35,14 +34,23 @@ def local_css(file_name):
 
 local_css("style.css")
 
+if 'sinW' not in st.session_state:
+    st.session_state.sinW = []
+
+if 'amp' not in st.session_state:
+    st.session_state.amp = []
+
+if 'freq' not in st.session_state:
+    st.session_state.freq = []   
+
+if 'sum' not in st.session_state:
+    st.session_state.sum = 0
 
 st.title(" Welcome to Sampling Studio")
-
 
 @st.cache(allow_output_mutation=True)
 def get_data():
     return []
-
 
 fig = plt.figure()
 flag_noised = False
@@ -65,7 +73,8 @@ with st.sidebar:
         get_data().append(
             {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
     Signals = pd.DataFrame(get_data())
-    # st.write(Signals)
+ 
+    st.write("")
 
     generate_expander_Delete = st.sidebar.expander(
         "Delete a Signal ", expanded=False)
@@ -89,7 +98,6 @@ with st.sidebar:
     else:
         st.write(Signals)
 
-    st.write("")
     generate_expander_Upload = st.sidebar.expander(
         "Upload Signal", expanded=False)
     file = generate_expander_Upload.file_uploader("")
@@ -97,14 +105,27 @@ with st.sidebar:
         Data = pd.read_csv(file)
 
     if st.checkbox("Add Noise"):
-        snr = st.slider("SNR", 0, 100, step=1)
-        noised_signal = logic.add_noise(st.session_state.sum, snr)
-        flag_noised = True
+        if len(Signals) ==0:
+            st.write("Please add a signal first.")
+        else:
+            snr = st.slider("SNR", 0, 100, step=1)
+            noised_signal = logic.add_noise(st.session_state.sum, snr)
+            flag_noised = True
         # st.session_state.sum = noised_signal
     generate_expander_save = st.sidebar.expander(
         "Save Signal", expanded=False)
     Folder_Name = generate_expander_save.text_input("Folder Name")
-    Save_button_clicked = generate_expander_save.button("Save")
+    
+    
+    data = pd.DataFrame({'time':logic.time,'magnitude':st.session_state.sum,'maxFreq':logic.get_maxF()})
+
+    csv = logic.save_File()
+    save_button_clicked = generate_expander_save.download_button(
+            label="Save",
+            data=csv,
+            file_name=('{}.csv'.format(Folder_Name)),
+            mime='text/csv',
+        )
 
 
 sample_rate = st.slider("Sample Rate", 1, 5, step=1)
@@ -117,20 +138,21 @@ if file is None:
       if flag_noised:
         y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF(),noised_signal)
         plt.subplot(211)
-        plt.plot(logic.time,y_new)
+        plt.plot(logic.time,noised_signal)   
         plt.subplot(212)
-        plt.plot(logic.time,noised_signal)  
+        plt.plot(logic.time,y_new)
       else:
         y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF(),st.session_state.sum)
         plt.subplot(211)
-        plt.plot(logic.time,(y_new))
-        plt.subplot(212)
         plt.plot(logic.time,st.session_state.sum)
+        plt.subplot(212)
+        plt.plot(logic.time,(y_new))
+        
 else:
         x,y,z = logic.open_File(file)
         y_new = logic.sinc_Interpolation(sample_rate*z,y)
         plt.subplot(211)
-        plt.plot(x,y_new)
-        plt.subplot(212)
         plt.plot(x,y)
+        plt.subplot(212)
+        plt.plot(x,y_new)
 st.pyplot()

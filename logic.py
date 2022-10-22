@@ -4,17 +4,6 @@ import scipy
 from scipy import signal
 import streamlit as st
 import pandas as pd
-if 'sinW' not in st.session_state:
-    st.session_state.sinW = []
-
-if 'amp' not in st.session_state:
-    st.session_state.amp = []
-
-if 'freq' not in st.session_state:
-    st.session_state.freq = []   
-
-if 'sum' not in st.session_state:
-    st.session_state.sum = 0
 
 class logic:
     time = np.linspace(0,1,200)
@@ -54,16 +43,12 @@ class logic:
         st.session_state.amp.append(amplitude)
         st.session_state.freq.append(frequency)
         st.session_state.sinW.append(amplitude*np.sin(2 * np.pi * frequency * logic.time ))
-        # st.session_state.i +=1
 
     def sum_signals():
         sum = np.zeros((200))
         for i in range (0,len(st.session_state.amp)):
             sum = sum + st.session_state.amp[i]*np.sin(2*np.pi * st.session_state.freq[i]*logic.time)
         return sum
-
-    # def delete_Signal(i):
-
 
     def get_maxF():
         if len(st.session_state.freq) ==0:
@@ -81,11 +66,12 @@ class logic:
         mean_noise = 0
         noise = np.random.normal(mean_noise, np.sqrt(noiseP_avg), len(signalP))
         noised_signal = target_Sig + noise
-
         return noised_signal
+
     def save_File():
         data = pd.DataFrame({'time':logic.time,'magnitude':st.session_state.sum,'maxFreq':logic.get_maxF()})
-        data.to_csv('G:\SBME\Third year\First term\DSP\Flask\l.csv',index=False)
+        return data.to_csv().encode('utf-8')
+
     def open_File(file):
         data = pd.read_csv(file)
         time = data[0,:]
