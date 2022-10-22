@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import scipy 
 from scipy import signal
 import streamlit as st
-
+import pandas as pd
 if 'sinW' not in st.session_state:
     st.session_state.sinW = []
 
@@ -67,7 +67,7 @@ class logic:
 
     def get_maxF():
         if len(st.session_state.freq) ==0:
-            maxF =0
+            maxF =1
         else:    
             maxF = max(st.session_state.freq)
         return maxF    
@@ -82,4 +82,13 @@ class logic:
         noise = np.random.normal(mean_noise, np.sqrt(noiseP_avg), len(signalP))
         noised_signal = target_Sig + noise
 
-        return noised_signal    
+        return noised_signal
+    def save_File():
+        data = pd.DataFrame({'time':logic.time,'magnitude':st.session_state.sum,'maxFreq':logic.get_maxF()})
+        data.to_csv('G:\SBME\Third year\First term\DSP\Flask\l.csv',index=False)
+    def open_File(file):
+        data = pd.read_csv(file)
+        time = data[0,:]
+        sum = data[1.:]
+        max_freq_upload = data[2,1]
+        return time,sum,max_freq_upload 

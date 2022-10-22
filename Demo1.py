@@ -87,25 +87,15 @@ with st.sidebar:
 
     st.button("Save")
 
-frequency = st.slider("Freq",1,300,step=1)
-sample_rate = st.slider("Sample Rate", 1, 300, step= 1)
+sample_rate = st.slider("Sample Rate", 1, 5, step= 1)
 # print(sample_rate)
 maxF = logic.get_maxF()
-
-# y = logic.sinc_Interpolation(sample_rate,maxF)
-# plt.subplot(211)
-# plt.plot(logic.time,st.session_state.sum)
-# plt.subplot(212)
-# plt.plot(logic.time,y)
-# st.pyplot()
-
-
 # y = logic.sinc_Interpolation(sample_rate,maxF)
 # for i in range(0, len(st.session_state.sinW)):
-y_new = logic.sinc_Interpolation(sample_rate)
-plt.subplot(211)
-plt.plot(logic.time,y_new)
-
-plt.subplot(212)
-plt.plot(logic.time,st.session_state.sum)
+if type(st.session_state.sum) is  np.ndarray:
+    y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF())
+    plt.subplot(211)
+    plt.plot(logic.time,y_new)
+    plt.subplot(212)
+    plt.plot(logic.time,st.session_state.sum)
 st.pyplot()
