@@ -1,4 +1,4 @@
-from tkinter import Label
+from tkinter import Y, Label
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -89,7 +89,7 @@ with st.sidebar:
 
 frequency = st.slider("Freq",1,300,step=1)
 sample_rate = st.slider("Sample Rate", 1, 300, step= 1)
-print(sample_rate)
+# print(sample_rate)
 maxF = logic.get_maxF()
 
 # y = logic.sinc_Interpolation(sample_rate,maxF)
@@ -102,8 +102,9 @@ maxF = logic.get_maxF()
 
 # y = logic.sinc_Interpolation(sample_rate,maxF)
 # for i in range(0, len(st.session_state.sinW)):
+y_new = logic.sinc_Interpolation(sample_rate)
 plt.subplot(211)
-plt.plot(logic.time,noised_signal)
+plt.plot(logic.time,y_new)
 
 plt.subplot(212)
 plt.plot(logic.time,st.session_state.sum)
