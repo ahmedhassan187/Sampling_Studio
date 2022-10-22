@@ -128,7 +128,7 @@ with st.sidebar:
         )
 
 
-sample_rate = st.slider("Sample Rate", 1, 5, step=1)
+sample_rate = st.slider("Sample Rate", 1, 30, step=1)
 # print(sample_rate)
 maxF = logic.get_maxF()
 # y = logic.sinc_Interpolation(sample_rate,maxF)
@@ -136,23 +136,26 @@ maxF = logic.get_maxF()
 if file is None:
     if type(st.session_state.sum) is  np.ndarray :
       if flag_noised:
-        y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF(),noised_signal)
+        consturcted = logic.sinc_Interpolation(sample_rate,noised_signal)
+        sampled_time,sampled_signal,peroidic_time = logic.sampling(sample_rate,noised_signal)
         plt.subplot(211)
-        plt.plot(logic.time,noised_signal)   
+        plt.plot(logic.time,noised_signal) 
+        plt.plot(sampled_time,sampled_signal,'o')  
         plt.subplot(212)
-        plt.plot(logic.time,y_new)
+        plt.plot(logic.time,consturcted)
       else:
-        y_new = logic.sinc_Interpolation(sample_rate*logic.get_maxF(),st.session_state.sum)
+        consturcted = logic.sinc_Interpolation(sample_rate,st.session_state.sum)
+        sampled_time,sampled_signal,peroidic_time = logic.sampling(sample_rate,st.session_state.sum)
         plt.subplot(211)
         plt.plot(logic.time,st.session_state.sum)
+        plt.plot(sampled_time,sampled_signal,'o')
         plt.subplot(212)
-        plt.plot(logic.time,(y_new))
-        
+        plt.plot(logic.time,consturcted)
 else:
-        x,y,z = logic.open_File(file)
-        y_new = logic.sinc_Interpolation(sample_rate*z,y)
+        time_of_uploaded,signal_uploaded,max_frequency = logic.open_File(file)
+        consturcted = logic.sinc_Interpolation(sample_rate,signal_uploaded)
         plt.subplot(211)
-        plt.plot(x,y)
+        plt.plot(time_of_uploaded,signal_uploaded)
         plt.subplot(212)
-        plt.plot(x,y_new)
+        plt.plot(time_of_uploaded,consturcted)
 st.pyplot()
