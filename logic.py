@@ -30,6 +30,28 @@ class logic:
             y_Points += st.session_state.amp[frequency]*np.sin(2*np.pi*st.session_state.freq[frequency]*t_Points)
         y_Points = y_Points.reshape(sample_Frequency,1)
         return t_Points,y_Points,T
+    def sampling_uploaded(sample_Frequency,original_Signal,time):
+        T = 1/sample_Frequency
+        points = np.arange(0,sample_Frequency)
+        peroid_of_peaks =  scipy.signal.find_peaks(original_Signal)
+        peroid_of_shift = time[peroid_of_peaks[0]]
+        t_Points = points*T
+        t_Points = t_Points + peroid_of_shift[peroid_of_peaks[0][0]]
+        y_Points = np.zeros(sample_Frequency)
+        for frequency in range(sample_Frequency):
+            difference_array = np.absolute(time-t_Points[frequency])
+            Min_index = difference_array.argmin()
+            y_Points[frequency] = original_Signal[Min_index]
+        y_Points = y_Points.reshape(sample_Frequency,1)
+        return t_Points,y_Points,T
+    def sinc_Interpolation_uploaded(sample_Frequency,original_Signal,time):
+        t_Points,y_Points,T = logic.sampling_uploaded(sample_Frequency,original_Signal,time)
+        [Ts,timee] = np.meshgrid(t_Points,logic.time,indexing='ij')
+        y = np.sinc((timee-Ts)/T)*y_Points
+        y_new = 0
+        for i in range(sample_Frequency):
+            y_new += y[i,:]
+        return y_new
     def sinc_Interpolation(sample_Frequency,original_Signal):
         t_Points,y_Points,T = logic.sampling(sample_Frequency,original_Signal)
         [Ts,timee] = np.meshgrid(t_Points,logic.time,indexing='ij')
@@ -74,7 +96,7 @@ class logic:
 
     def open_File(file):
         data = pd.read_csv(file)
-        time = data[0,:]
-        sum = data[1.:]
-        max_freq_upload = data[2,1]
+        time = data['time']
+        sum = data['magnitude']
+        max_freq_upload = data['maxFreq'][2]
         return time,sum,max_freq_upload 

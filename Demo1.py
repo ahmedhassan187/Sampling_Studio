@@ -153,9 +153,11 @@ if file is None:
         plt.plot(logic.time,consturcted)
 else:
         time_of_uploaded,signal_uploaded,max_frequency = logic.open_File(file)
-        consturcted = logic.sinc_Interpolation(sample_rate,signal_uploaded)
+        consturcted = logic.sinc_Interpolation_uploaded(sample_rate,signal_uploaded,time_of_uploaded)
+        sampled_time,sampled_signal,peroidic_time = logic.sampling_uploaded(sample_rate,signal_uploaded,time_of_uploaded)
         plt.subplot(211)
         plt.plot(time_of_uploaded,signal_uploaded)
+        plt.plot(sampled_time,sampled_signal,'o')
         plt.subplot(212)
         plt.plot(time_of_uploaded,consturcted)
 st.pyplot()
