@@ -98,6 +98,7 @@ with st.sidebar:
     else:
         st.write(Signals)
 
+
     generate_expander_Upload = st.sidebar.expander(
         "Upload Signal", expanded=False)
     file = generate_expander_Upload.file_uploader("")
@@ -105,19 +106,22 @@ with st.sidebar:
         Data = pd.read_csv(file)
 
     if st.checkbox("Add Noise"):
-        if len(Signals) ==0:
-            st.write("Please add a signal first.")
+        snr = st.slider("SNR", 0, 100, step=1)
+
+        if file is None:
+            if len(Signals) ==0:
+                st.write("Please add a signal first.")
+            else:
+               
+                noised_signal = logic.add_noise(st.session_state.sum, snr)
+                flag_noised = True
         else:
-            snr = st.slider("SNR", 0, 100, step=1)
-            noised_signal = logic.add_noise(st.session_state.sum, snr)
             flag_noised = True
-        # st.session_state.sum = noised_signal
+            
+
     generate_expander_save = st.sidebar.expander(
         "Save Signal", expanded=False)
     Folder_Name = generate_expander_save.text_input("Folder Name")
-    
-    
-    data = pd.DataFrame({'time':logic.time,'magnitude':st.session_state.sum,'maxFreq':logic.get_maxF()})
 
     csv = logic.save_File()
     save_button_clicked = generate_expander_save.download_button(
@@ -129,10 +133,8 @@ with st.sidebar:
 
 
 sample_rate = st.slider("Sample Rate", 1, 30, step=1)
-# print(sample_rate)
+
 maxF = logic.get_maxF()
-# y = logic.sinc_Interpolation(sample_rate,maxF)
-# for i in range(0, len(st.session_state.sinW)):
 if file is None:
     if type(st.session_state.sum) is  np.ndarray :
       if flag_noised:
@@ -151,7 +153,9 @@ if file is None:
         plt.plot(sampled_time,sampled_signal,'o')
         plt.subplot(212)
         plt.plot(logic.time,consturcted)
+        
 else:
+    if flag_noised == False:
         time_of_uploaded,signal_uploaded,max_frequency = logic.open_File(file)
         consturcted = logic.sinc_Interpolation_uploaded(sample_rate,signal_uploaded,time_of_uploaded)
         sampled_time,sampled_signal,peroidic_time = logic.sampling_uploaded(sample_rate,signal_uploaded,time_of_uploaded)
@@ -160,4 +164,15 @@ else:
         plt.plot(sampled_time,sampled_signal,'o')
         plt.subplot(212)
         plt.plot(time_of_uploaded,consturcted)
+
+    else:
+        time_of_uploaded,signal_uploaded,max_frequency = logic.open_File(file)
+        noised_signal = logic.add_noise(signal_uploaded, snr)
+        consturcted = logic.sinc_Interpolation_uploaded(sample_rate,noised_signal,time_of_uploaded)
+        sampled_time,sampled_signal,peroidic_time = logic.sampling_uploaded(sample_rate,noised_signal,time_of_uploaded)
+        plt.subplot(211)
+        plt.plot(time_of_uploaded,noised_signal)
+        plt.plot(sampled_time,sampled_signal,'o')
+        plt.subplot(212)
+        plt.plot(time_of_uploaded,consturcted)        
 st.pyplot()

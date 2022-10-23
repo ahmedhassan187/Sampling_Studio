@@ -30,6 +30,7 @@ class logic:
             y_Points += st.session_state.amp[frequency]*np.sin(2*np.pi*st.session_state.freq[frequency]*t_Points)
         y_Points = y_Points.reshape(sample_Frequency,1)
         return t_Points,y_Points,T
+
     def sampling_uploaded(sample_Frequency,original_Signal,time):
         T = 1/sample_Frequency
         points = np.arange(0,sample_Frequency)
@@ -44,6 +45,7 @@ class logic:
             y_Points[frequency] = original_Signal[Min_index]
         y_Points = y_Points.reshape(sample_Frequency,1)
         return t_Points,y_Points,T
+
     def sinc_Interpolation_uploaded(sample_Frequency,original_Signal,time):
         t_Points,y_Points,T = logic.sampling_uploaded(sample_Frequency,original_Signal,time)
         [Ts,timee] = np.meshgrid(t_Points,logic.time,indexing='ij')
@@ -52,6 +54,7 @@ class logic:
         for i in range(sample_Frequency):
             y_new += y[i,:]
         return y_new
+        
     def sinc_Interpolation(sample_Frequency,original_Signal):
         t_Points,y_Points,T = logic.sampling(sample_Frequency,original_Signal)
         [Ts,timee] = np.meshgrid(t_Points,logic.time,indexing='ij')
