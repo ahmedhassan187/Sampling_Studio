@@ -6,7 +6,7 @@ import streamlit as st
 import pandas as pd
 
 class logic:
-    time = np.linspace(0,1,200)
+    time = np.linspace(0,1,1000)
     signals_list = []
     def add_Sine(frequency,magnitude):
         result = magnitude*np.sin(2*np.pi*logic.time*frequency)
@@ -14,6 +14,11 @@ class logic:
 
     def remove_Signal(index,signal_list):
         del signal_list[index]
+        del st.session_state.sinW[index]
+        del st.session_state.amp[index]
+        del st.session_state.freq[index]
+
+    def delete_Signal(index):
         del st.session_state.sinW[index]
         del st.session_state.amp[index]
         del st.session_state.freq[index]
@@ -70,7 +75,7 @@ class logic:
         st.session_state.sinW.append(amplitude*np.sin(2 * np.pi * frequency * logic.time ))
 
     def sum_signals():
-        sum = np.zeros((200))
+        sum = np.zeros((1000))
         for i in range (0,len(st.session_state.amp)):
             sum = sum + st.session_state.amp[i]*np.sin(2*np.pi * st.session_state.freq[i]*logic.time)
         return sum
@@ -83,13 +88,13 @@ class logic:
         return maxF    
 
     def add_noise(target_Sig,snr_db):
-        signalP = pow(target_Sig,2)
-        signalP_avg = np.mean(signalP)
+        signal_Power = pow(target_Sig,2)
+        signalP_avg = np.mean(signal_Power)
         signal_avg_db = 10 * np.log10(signalP_avg)
         noise_avg_db = signal_avg_db - snr_db
         noiseP_avg = 10 ** (noise_avg_db / 10)
         mean_noise = 0
-        noise = np.random.normal(mean_noise, np.sqrt(noiseP_avg), len(signalP))
+        noise = np.random.normal(mean_noise, np.sqrt(noiseP_avg), len(signal_Power))
         noised_signal = target_Sig + noise
         return noised_signal
 

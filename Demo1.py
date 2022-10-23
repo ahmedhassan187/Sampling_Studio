@@ -6,15 +6,12 @@ from traitlets import default
 from logic import logic
 import matplotlib.pyplot as plt
 import time
-# from collections import namedtuple, defaultdict
-import mpld3
-# import streamlit.components.v1 as components
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(
     page_title='Sampling Studio',
     page_icon="chart_with_upwards_trend",
-    layout='wide'
+    # layout='wide'
 )
 
 hide_st_style = """
@@ -46,7 +43,7 @@ if 'freq' not in st.session_state:
 if 'sum' not in st.session_state:
     st.session_state.sum = 0
 
-st.title(" Welcome to Sampling Studio")
+# st.title(" Welcome to Sampling Studio")
 
 @st.cache(allow_output_mutation=True)
 def get_data():
@@ -56,7 +53,7 @@ fig = plt.figure()
 flag_noised = False
 with st.sidebar:
 
-    st.title(':gear: Sampling Studio')
+    st.title('Sampling Studio')
     generate_expander = st.sidebar.expander(
         "Generate/Add Signal ", expanded=False)
     Label = generate_expander.text_input("Label")
@@ -104,8 +101,8 @@ with st.sidebar:
     generate_expander_Upload = st.sidebar.expander(
         "Upload Signal", expanded=False)
     file = generate_expander_Upload.file_uploader("")
-    if generate_expander_Upload.button(" Upload a Signal"):
-        Data = pd.read_csv(file)
+    # if generate_expander_Upload.button(" Upload a Signal"):
+    #     Data = pd.read_csv(file)
 
     if st.checkbox("Add Noise"):
         snr = st.slider("SNR", 0, 100, step=1)
@@ -139,36 +136,76 @@ sample_rate = st.slider("Sample Rate", 1, 30, step=1)
 maxF = logic.get_maxF()
 if file is None:
     if type(st.session_state.sum) is  np.ndarray :
+    #   logic.delete_Signal(1)
       if flag_noised:
         consturcted = logic.sinc_Interpolation(sample_rate,noised_signal)
         sampled_time,sampled_signal,peroidic_time = logic.sampling(sample_rate,noised_signal)
         plt.subplot(211)
-        plt.plot(logic.time,noised_signal, label = "Added Signals") 
+        plt.plot(logic.time,noised_signal, label = "Added Signals with noise") 
         plt.plot(sampled_time,sampled_signal,'o',label= "Sampling points") 
-        plt.xlabel("Time")
+        plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude") 
-        plt.legend()
+        plt.legend(loc = 'upper right')
+        plt.tight_layout()
         plt.subplot(212)
-        plt.plot(logic.time,consturcted)
+        plt.plot(logic.time,consturcted, label = "Reconstructed Signals")
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
       else:
         consturcted = logic.sinc_Interpolation(sample_rate,st.session_state.sum)
         sampled_time,sampled_signal,peroidic_time = logic.sampling(sample_rate,st.session_state.sum)
         plt.subplot(211)
-        plt.plot(logic.time,st.session_state.sum)
-        plt.plot(sampled_time,sampled_signal,'o')
+        plt.plot(logic.time,st.session_state.sum, label = "Added Signals")
+        plt.plot(sampled_time,sampled_signal,'o',label= "Sampling Points")
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
+        plt.tight_layout()
         plt.subplot(212)
-        plt.plot(logic.time,consturcted)
+        plt.plot(logic.time,consturcted, label = "Reconstructed Signal")
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
+    else:
+        st.session_state.sum = np.sin(2*np.pi*2*logic.time)
+        st.session_state.freq.append(2)
+        st.session_state.amp.append(1)
+        get_data().append(
+            {"Label": 'Default Signal', "Frecquency in Hz": 2, "Amplitude": 1})
+        consturcted = logic.sinc_Interpolation(sample_rate,st.session_state.sum)
+        sampled_time,sampled_signal,peroidic_time = logic.sampling(sample_rate,st.session_state.sum)
+        plt.subplot(211)
+        plt.plot(logic.time,np.sin(2*np.pi * 2 *logic.time))
+        plt.plot(sampled_time,sampled_signal,'o')
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
+        plt.tight_layout()
+        plt.subplot(212)
+        plt.plot(logic.time,consturcted, label = "Reconstructed Signal")
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
         
+ 
 else:
     if flag_noised == False:
         time_of_uploaded,signal_uploaded,max_frequency = logic.open_File(file)
         consturcted = logic.sinc_Interpolation_uploaded(sample_rate,signal_uploaded,time_of_uploaded)
         sampled_time,sampled_signal,peroidic_time = logic.sampling_uploaded(sample_rate,signal_uploaded,time_of_uploaded)
         plt.subplot(211)
-        plt.plot(time_of_uploaded,signal_uploaded)
-        plt.plot(sampled_time,sampled_signal,'o')
+        plt.plot(time_of_uploaded,signal_uploaded, label = "Uploaded Signal")
+        plt.plot(sampled_time,sampled_signal,'o', label  = "Sampling Points")
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
+        plt.tight_layout()
         plt.subplot(212)
-        plt.plot(time_of_uploaded,consturcted)
+        plt.plot(time_of_uploaded,consturcted, label = "Reconstructed Signal")
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
 
     else:
         time_of_uploaded,signal_uploaded,max_frequency = logic.open_File(file)
@@ -176,8 +213,15 @@ else:
         consturcted = logic.sinc_Interpolation_uploaded(sample_rate,noised_signal,time_of_uploaded)
         sampled_time,sampled_signal,peroidic_time = logic.sampling_uploaded(sample_rate,noised_signal,time_of_uploaded)
         plt.subplot(211)
-        plt.plot(time_of_uploaded,noised_signal)
-        plt.plot(sampled_time,sampled_signal,'o')
+        plt.plot(time_of_uploaded,noised_signal, label = "Uploaded Signal with noise")
+        plt.plot(sampled_time,sampled_signal,'o', label = "Sampling Points")
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')
+        plt.tight_layout()
         plt.subplot(212)
-        plt.plot(time_of_uploaded,consturcted)        
+        plt.plot(time_of_uploaded,consturcted, label = "Reconstructed Signal")   
+        plt.xlabel("Time(sec)")
+        plt.ylabel("Amplitude") 
+        plt.legend(loc = 'upper right')     
 st.pyplot()
