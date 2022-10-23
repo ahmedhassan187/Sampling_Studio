@@ -80,7 +80,7 @@ with st.sidebar:
         "Delete a Signal ", expanded=False)
 
     Deleted_Signal = generate_expander_Delete.number_input(
-        "Enter the row of the Signal", step=1)
+        "Enter the row of the Signal", step=1, min_value=0)
     delete_button = generate_expander_Delete.button('Delete A signal')
     if delete_button:
         if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
@@ -88,11 +88,13 @@ with st.sidebar:
         else:
             logic.remove_Signal(int(Deleted_Signal), get_data())
             Signals.drop([Deleted_Signal], axis=0, inplace=True)
-
             if (len(Signals) == 0):
                 st.session_state.sum = 0
+                st.experimental_rerun()
             else:
                 st.session_state.sum = logic.sum_signals()
+                st.experimental_rerun()
+                
     if Signals.empty:
         st.write("")
     else:
@@ -141,8 +143,11 @@ if file is None:
         consturcted = logic.sinc_Interpolation(sample_rate,noised_signal)
         sampled_time,sampled_signal,peroidic_time = logic.sampling(sample_rate,noised_signal)
         plt.subplot(211)
-        plt.plot(logic.time,noised_signal) 
-        plt.plot(sampled_time,sampled_signal,'o')  
+        plt.plot(logic.time,noised_signal, label = "Added Signals") 
+        plt.plot(sampled_time,sampled_signal,'o',label= "Sampling points") 
+        plt.xlabel("Time")
+        plt.ylabel("Amplitude") 
+        plt.legend()
         plt.subplot(212)
         plt.plot(logic.time,consturcted)
       else:
