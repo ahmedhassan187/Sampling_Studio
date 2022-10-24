@@ -74,10 +74,9 @@ with st.sidebar:
     if Add_button_clicked:
         logic.add_signals(Amplitude, freq)
         st.session_state.sum = logic.sum_signals()
-        if Label == "":
-
+        if Label == ""or Label == " ":
             Label = 'Signal' + str(st.session_state.label_generated)
-            # st.session_state.label_generated += 1
+            st.session_state.label_generated += 1
         get_data().append(
             {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
 
@@ -146,7 +145,6 @@ sample_rate = st.slider("Sample Rate", 1, 30, step=1)
 maxF = logic.get_maxF()
 if file is None:
     if type(st.session_state.sum) is np.ndarray:
-        #   logic.delete_Signal(1)
         if flag_noised:
             consturcted = logic.sinc_Interpolation(sample_rate, noised_signal)
             sampled_time, sampled_signal, peroidic_time = logic.sampling(

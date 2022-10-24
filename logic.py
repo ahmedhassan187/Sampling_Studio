@@ -18,11 +18,11 @@ class logic:
         del st.session_state.amp[index]
         del st.session_state.freq[index]
 
-    def delete_Signal(index):
+    def delete_Signal(index):        
         del st.session_state.sinW[index]
         del st.session_state.amp[index]
         del st.session_state.freq[index]
-
+        
     def sampling(sample_Frequency,original_Signal):
         T = 1/sample_Frequency
         points = np.arange(0,sample_Frequency)
