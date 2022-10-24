@@ -12,6 +12,12 @@ st.set_page_config(
     page_icon="chart_with_upwards_trend",
     # layout='wide'
 )
+reduce_header_height_style = """
+    <style>
+        div.block-container {padding-top:0rem;}
+    </style>
+"""
+st.markdown(reduce_header_height_style, unsafe_allow_html=True)
 
 # st.session_state.label_generated = 0
 
@@ -48,7 +54,7 @@ if 'freq' not in st.session_state:
 if 'sum' not in st.session_state:
     st.session_state.sum = 0
 if 'constructed' not in st.session_state:
-    st.session_state.constructed= 0
+    st.session_state.constructed = 0
 # st.title(" Welcome to Sampling Studio")
 
 
@@ -66,19 +72,22 @@ with st.sidebar:
         "Generate/Add Signal ", expanded=False)
     Label = generate_expander.text_input("Label")
     freq = generate_expander.number_input(
-        "Frecquency in Hz", step=1, min_value=1)
+        "Frequency(Hz)", step=1, min_value=1)
     Amplitude = generate_expander.number_input(
-        "Amplitude", step=1, min_value=1)
+        "Amplitude(V)", step=1, min_value=1)
     Add_button_clicked = generate_expander.button("Save", key=1)
 
     if Add_button_clicked:
+
+        generate_expander = st.sidebar.expander(
+            "Generate/Add Signal ", expanded=False)
         logic.add_signals(Amplitude, freq)
         st.session_state.sum = logic.sum_signals()
-        if Label == ""or Label == " ":
+        if Label == "" or Label == " ":
             Label = 'Signal' + str(st.session_state.label_generated)
             st.session_state.label_generated += 1
         get_data().append(
-            {"Label": Label, "Frecquency in Hz": freq, "Amplitude": Amplitude})
+            {"Label": Label, "Frequency in Hz": freq, "Amplitude": Amplitude})
 
     Signals = pd.DataFrame(get_data())
 
@@ -140,28 +149,40 @@ with st.sidebar:
     )
 
 
-sample_rate = st.slider("Sample Rate", 1, 30, step=1)
+# sample_rate = st.slider("Sample Rate", 1, 30, step=1)
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    sample_rate = st.slider("Sample Rate", 1, 60, step=1)
+
+with col2:
+    Frecquency_default = st.slider("Frequency(HZ)", 0, 30, step=1)
+
+with col3:
+    Amplitude_default = st.slider("Amplitude(V)", 1, 15, step=1)
+
 
 maxF = logic.get_maxF()
 if file is None:
     if type(st.session_state.sum) is np.ndarray:
         if flag_noised:
-            st.session_state.constructed = logic.sinc_Interpolation(sample_rate, noised_signal)
+            st.session_state.constructed = logic.sinc_Interpolation(
+                sample_rate, noised_signal)
             sampled_time, sampled_signal, peroidic_time = logic.sampling(
                 sample_rate, noised_signal)
             plt.subplot(211)
-            plt.plot(logic.time, noised_signal,
-                     label="Added Signals with noise")
+            plt.plot(logic.time, noised_signal,)
             plt.plot(sampled_time, sampled_signal,
-                     'o', label="Sampling points")
+                     'o',)
             plt.xlabel("Time(sec)")
-            plt.ylabel("Amplitude")
-            plt.legend(loc='upper right')
+            plt.ylabel("Amplitude(V)")
+            # plt.legend(loc='upper right')
             plt.tight_layout()
             plt.subplot(212)
-            plt.plot(logic.time, st.session_state.constructed, label="Reconstructed Signals")
+            plt.plot(logic.time, st.session_state.constructed,
+                     label="Reconstructed Signals")
             plt.xlabel("Time(sec)")
-            plt.ylabel("Amplitude")
+            plt.ylabel("Amplitude(V)")
             plt.legend(loc='upper right')
         else:
             st.session_state.constructed = logic.sinc_Interpolation(
@@ -169,40 +190,45 @@ if file is None:
             sampled_time, sampled_signal, peroidic_time = logic.sampling(
                 sample_rate, st.session_state.sum)
             plt.subplot(211)
-            plt.plot(logic.time, st.session_state.sum, label="Added Signals")
+            plt.plot(logic.time, st.session_state.sum)
             plt.plot(sampled_time, sampled_signal,
-                     'o', label="Sampling Points")
+                     'o')
             plt.xlabel("Time(sec)")
-            plt.ylabel("Amplitude")
-            plt.legend(loc='upper right')
+            plt.ylabel("Amplitude(V)")
+            # plt.legend(loc='upper right')
             plt.tight_layout()
             plt.subplot(212)
-            plt.plot(logic.time, st.session_state.constructed, label="Reconstructed Signal")
+            plt.plot(logic.time, st.session_state.constructed,
+                     label="Reconstructed Signal")
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude")
             plt.legend(loc='upper right')
     else:
-        st.session_state.sum += np.sin(2*np.pi*2*logic.time)
-        st.session_state.freq.append(2)
-        st.session_state.amp.append(1)
-        st.session_state.sinW.append(np.sin(2*np.pi*2*logic.time))
+        st.session_state.sum += Amplitude_default * \
+            np.sin(2*np.pi*Frecquency_default*logic.time)
+        st.session_state.freq.append(Frecquency_default)
+        st.session_state.amp.append(Amplitude_default)
+        st.session_state.sinW.append(
+            Amplitude_default*np.sin(2*np.pi*Frecquency_default*logic.time))
         get_data().append(
-            {"Label": 'Default Signal', "Frecquency in Hz": 2, "Amplitude": 1})
+            {"Label": 'Default Signal', "Frecquency in Hz": Frecquency_default, "Amplitude": Amplitude_default})
         st.session_state.constructed = logic.sinc_Interpolation(
             sample_rate, st.session_state.sum)
         sampled_time, sampled_signal, peroidic_time = logic.sampling(
             sample_rate, st.session_state.sum)
         plt.subplot(211)
-        plt.plot(logic.time, np.sin(2*np.pi * 2 * logic.time))
+        plt.plot(logic.time, Amplitude_default *
+                 np.sin(2*np.pi * Frecquency_default * logic.time))
         plt.plot(sampled_time, sampled_signal, 'o')
         plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude")
-        plt.legend(loc='upper right')
+        plt.ylabel("Amplitude(V)")
+        # plt.legend(loc='upper right')
         plt.tight_layout()
         plt.subplot(212)
-        plt.plot(logic.time, st.session_state.constructed, label="Reconstructed Signal")
+        plt.plot(logic.time, st.session_state.constructed,
+                 label="Reconstructed Signal")
         plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude")
+        plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
 else:
     if flag_noised == False:
@@ -213,14 +239,16 @@ else:
         sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
             sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
         plt.subplot(211)
-        plt.plot(time_of_uploaded, (signal_uploaded+st.session_state.sum), label="Uploaded Signal")
-        plt.plot(sampled_time, sampled_signal, 'o', label="Sampling Points")
+        plt.plot(time_of_uploaded, (signal_uploaded +
+                 st.session_state.sum))
+        plt.plot(sampled_time, sampled_signal, 'o')
         plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude")
+        plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
-        plt.tight_layout()
+        # plt.tight_layout()
         plt.subplot(212)
-        plt.plot(time_of_uploaded, st.session_state.constructed, label="Reconstructed Signal")
+        plt.plot(time_of_uploaded, st.session_state.constructed,
+                 label="Reconstructed Signal")
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude")
         plt.legend(loc='upper right')
@@ -229,21 +257,21 @@ else:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(
             file)
         noised_signal = logic.add_noise(signal_uploaded, snr)
-        st.session_state.constructed= logic.sinc_Interpolation_uploaded(
+        st.session_state.constructed = logic.sinc_Interpolation_uploaded(
             sample_rate, noised_signal, time_of_uploaded)
         sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
             sample_rate, noised_signal, time_of_uploaded)
         plt.subplot(211)
-        plt.plot(time_of_uploaded, noised_signal,
-                 label="Uploaded Signal with noise")
-        plt.plot(sampled_time, sampled_signal, 'o', label="Sampling Points")
+        plt.plot(time_of_uploaded, noised_signal,)
+        plt.plot(sampled_time, sampled_signal, 'o')
         plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude")
-        plt.legend(loc='upper right')
+        plt.ylabel("Amplitude(V)")
+        # plt.legend(loc='upper right')
         plt.tight_layout()
         plt.subplot(212)
-        plt.plot(time_of_uploaded, st.session_state.constructed, label="Reconstructed Signal")
+        plt.plot(time_of_uploaded, st.session_state.constructed,
+                 label="Reconstructed Signal")
         plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude")
+        plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
 st.pyplot()
