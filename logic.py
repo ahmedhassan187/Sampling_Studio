@@ -99,7 +99,7 @@ class logic:
         return noised_signal
 
     def save_File():
-        data = pd.DataFrame({'time':logic.time,'magnitude':st.session_state.sum,'maxFreq':logic.get_maxF()})
+        data = pd.DataFrame({'time':logic.time,'magnitude':st.session_state.constructed,'maxFreq':logic.get_maxF()})
         return data.to_csv().encode('utf-8')
 
     def open_File(file):
