@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sys
+from torch import empty
 from traitlets import default
 from logic import logic
 import matplotlib.pyplot as plt
@@ -156,10 +157,18 @@ with col1:
     sample_rate = st.slider("Sample Rate", 1, 60, step=1)
 
 with col2:
-    Frecquency_default = st.slider("Frequency(HZ)", 0, 30, step=1)
-
+    Frecquency_default = st.slider("Frequency(HZ)", 1, 30, step=1)
+    if st.session_state.freq == []:
+        pass
+    else:
+        st.session_state.freq[0] = Frecquency_default
 with col3:
     Amplitude_default = st.slider("Amplitude(V)", 1, 15, step=1)
+    if st.session_state.amp == []:
+        pass
+    else:
+        st.session_state.amp[0] = Amplitude_default
+        st.session_state.sum = logic.sum_signals()
 
 
 maxF = logic.get_maxF()
@@ -204,16 +213,14 @@ if file is None:
             plt.ylabel("Amplitude")
             plt.legend(loc='upper right')
     else:
-        st.session_state.sum += Amplitude_default * \
-            np.sin(2*np.pi*Frecquency_default*logic.time)
+        st.session_state.sum = Amplitude_default *np.sin(2*np.pi*Frecquency_default*logic.time)
         st.session_state.freq.append(Frecquency_default)
         st.session_state.amp.append(Amplitude_default)
         st.session_state.sinW.append(
             Amplitude_default*np.sin(2*np.pi*Frecquency_default*logic.time))
         get_data().append(
-            {"Label": 'Default Signal', "Frecquency in Hz": Frecquency_default, "Amplitude": Amplitude_default})
-        st.session_state.constructed = logic.sinc_Interpolation(
-            sample_rate, st.session_state.sum)
+            {"Label": 'Default Signal', "Frequency in Hz": Frecquency_default, "Amplitude": Amplitude_default})
+        st.session_state.constructed = logic.sinc_Interpolation(sample_rate, st.session_state.sum)
         sampled_time, sampled_signal, peroidic_time = logic.sampling(
             sample_rate, st.session_state.sum)
         plt.subplot(211)
