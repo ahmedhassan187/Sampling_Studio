@@ -182,9 +182,10 @@ if file is None:
             plt.ylabel("Amplitude")
             plt.legend(loc='upper right')
     else:
-        st.session_state.sum = np.sin(2*np.pi*2*logic.time)
+        st.session_state.sum += np.sin(2*np.pi*2*logic.time)
         st.session_state.freq.append(2)
         st.session_state.amp.append(1)
+        st.session_state.sinW.append(np.sin(2*np.pi*2*logic.time))
         get_data().append(
             {"Label": 'Default Signal', "Frecquency in Hz": 2, "Amplitude": 1})
         consturcted = logic.sinc_Interpolation(
@@ -203,8 +204,6 @@ if file is None:
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude")
         plt.legend(loc='upper right')
-
-
 else:
     if flag_noised == False:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(
