@@ -6,11 +6,11 @@ import streamlit as st
 import pandas as pd
 
 class logic:
-    time = np.linspace(0,1,200)
-    signals_list = []
-    def add_Sine(frequency,magnitude):
-        result = magnitude*np.sin(2*np.pi*logic.time*frequency)
-        logic.signals_List.append(result)
+    time = np.linspace(0,1,1000)
+    # signals_list = []
+    # def add_Sine(frequency,magnitude):
+    #     result = magnitude*np.sin(2*np.pi*logic.time*frequency)
+    #     logic.signals_List.append(result)
 
     def remove_Signal(index,signal_list):
         del signal_list[index]
@@ -70,7 +70,7 @@ class logic:
         st.session_state.sinW.append(amplitude*np.sin(2 * np.pi * frequency * logic.time ))
 
     def sum_signals():
-        sum = np.zeros((200))
+        sum = np.zeros((1000))
         for i in range (0,len(st.session_state.amp)):
             sum = sum + st.session_state.amp[i]*np.sin(2*np.pi * st.session_state.freq[i]*logic.time)
         return sum
