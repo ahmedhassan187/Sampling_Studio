@@ -69,60 +69,33 @@ flag_noised = False
 with st.sidebar:
 
     st.title('Sampling Studio')
-    generate_expander = st.sidebar.expander(
-        "Generate/Add Signal ", expanded=False)
-    Label = generate_expander.text_input("Label")
-    freq = generate_expander.number_input(
-        "Frequency(Hz)", step=1, min_value=1)
-    Amplitude = generate_expander.number_input(
-        "Amplitude(V)", step=1, min_value=1)
-    Add_button_clicked = generate_expander.button("Save", key=1)
+
+    Label = st.text_input("label")
+    col1, col2 = st.columns((1,1))
+
+    with col1:
+        freq = st.number_input("Frequency", step=1, min_value=1)
+
+    with col2:
+        Amplitude = st.number_input("Amplitude", step=1, min_value=1)
+
+    Add_button_clicked = st.button("Add", key=1)
 
     if Add_button_clicked:
-
-        generate_expander = st.sidebar.expander(
-            "Generate/Add Signal ", expanded=False)
         logic.add_signals(Amplitude, freq)
         st.session_state.sum = logic.sum_signals()
-        if Label == "" or Label == " ":
+        if Label == ""or Label == " ":
             Label = 'Signal' + str(st.session_state.label_generated)
             st.session_state.label_generated += 1
         get_data().append(
-            {"Label": Label, "Frequency in Hz": freq, "Amplitude": Amplitude})
+            {"Label": Label, "Frecquency (Hz)": freq, "Amplitude (V)": Amplitude})
+
 
     Signals = pd.DataFrame(get_data())
+ 
 
-    st.write("")
+    file = st.file_uploader("Upload")
 
-    generate_expander_Delete = st.sidebar.expander(
-        "Delete a Signal ", expanded=False)
-
-    Deleted_Signal = generate_expander_Delete.number_input(
-        "Enter the row of the Signal", step=1, min_value=0)
-    delete_button = generate_expander_Delete.button('Delete A signal')
-    if delete_button:
-        if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
-            st.text("Invalid number")
-        else:
-            logic.remove_Signal(int(Deleted_Signal), get_data())
-            Signals.drop([Deleted_Signal], axis=0, inplace=True)
-            if (len(Signals) == 0):
-                st.session_state.sum = 0
-                st.experimental_rerun()
-            else:
-                st.session_state.sum = logic.sum_signals()
-                st.experimental_rerun()
-
-    if Signals.empty:
-        st.write("")
-    else:
-        st.write(Signals)
-
-    generate_expander_Upload = st.sidebar.expander(
-        "Upload Signal", expanded=False)
-    file = generate_expander_Upload.file_uploader("")
-    # if generate_expander_Upload.button(" Upload a Signal"):
-    #     Data = pd.read_csv(file)
 
     if st.checkbox("Add Noise"):
         snr = st.slider("SNR", 0, 100, step=1)
@@ -137,20 +110,100 @@ with st.sidebar:
         else:
             flag_noised = True
 
-    generate_expander_save = st.sidebar.expander(
-        "Save Signal", expanded=False)
-    Folder_Name = generate_expander_save.text_input("Folder Name")
+
+    Deleted_Signal = st.number_input("Deleted row",step=1, min_value=0)
+    delete_button = st.button('Delete')
+    if delete_button:
+        if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
+            st.text("Invalid number")
+        else:
+            logic.remove_Signal(int(Deleted_Signal), get_data())
+            Signals.drop([Deleted_Signal], axis=0, inplace=True)
+            if (len(Signals) == 0):
+                st.session_state.sum = 0
+                st.experimental_rerun()
+            else:
+                st.session_state.sum = logic.sum_signals()
+                st.experimental_rerun()
+
+
+    Folder_Name = st.text_input("Folder Name")
 
     csv = logic.save_File()
-    save_button_clicked = generate_expander_save.download_button(
+    save_button_clicked = st.download_button(
         label="Save",
         data=csv,
         file_name=('{}.csv'.format(Folder_Name)),
         mime='text/csv',
     )
 
+    if Signals.empty:
+        st.write("")
+    else:
+        st.write(Signals)
+
+    st.write("")
+
+    # generate_expander = st.sidebar.expander(
+    #     "Add Signal ", expanded=False)
+    # Label = generate_expander.text_input("Label")
+    # freq = generate_expander.number_input(
+    #     "Frequency(Hz)", step=1, min_value=1)
+    # Amplitude = generate_expander.number_input(
+    #     "Amplitude(V)", step=1, min_value=1)
+    # Add_button_clicked = generate_expander.button("Add", key=1)
+
+    # if Add_button_clicked:
+
+      
+    #     logic.add_signals(Amplitude, freq)
+    #     st.session_state.sum = logic.sum_signals()
+    #     if Label == "" or Label == " ":
+    #         Label = 'Signal' + str(st.session_state.label_generated)
+    #         st.session_state.label_generated += 1
+    #     get_data().append(
+    #         {"Label": Label, "Frequency(Hz)": freq, "Amplitude(V)": Amplitude})
+
+    # generate_expander_Delete = st.sidebar.expander(
+    #     "Delete Signal ", expanded=False)
+
+    # Deleted_Signal = generate_expander_Delete.number_input(
+    #     "Signal Row", step=1, min_value=0)
+    # delete_button = generate_expander_Delete.button('Delete')
+    # if delete_button:
+    #     if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
+    #         st.text("Invalid number")
+    #     else:
+    #         logic.remove_Signal(int(Deleted_Signal), get_data())
+    #         Signals.drop([Deleted_Signal], axis=0, inplace=True)
+    #         if (len(Signals) == 0):
+    #             st.session_state.sum = 0
+    #             st.experimental_rerun()
+    #         else:
+    #             st.session_state.sum = logic.sum_signals()
+    #             st.experimental_rerun()
+
+    # generate_expander_Upload = st.sidebar.expander(
+    #     "Upload Signal", expanded=False)
+    
+    # if generate_expander_Upload.button(" Upload a Signal"):
+    #     Data = pd.read_csv(file)
+
+    # generate_expander_save = st.sidebar.expander(
+    #     "Save Signal", expanded=False)
+    # Folder_Name = generate_expander_save.text_input("Folder Name")
+
+    # csv = logic.save_File()
+    # save_button_clicked = generate_expander_save.download_button(
+    #     label="Save",
+    #     data=csv,
+    #     file_name=('{}.csv'.format(Folder_Name)),
+    #     mime='text/csv',
+    # )
+
 
 # sample_rate = st.slider("Sample Rate", 1, 30, step=1)
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -219,7 +272,7 @@ if file is None:
         st.session_state.sinW.append(
             Amplitude_default*np.sin(2*np.pi*Frecquency_default*logic.time))
         get_data().append(
-            {"Label": 'Default Signal', "Frequency in Hz": Frecquency_default, "Amplitude": Amplitude_default})
+            {"Label": 'Default Signal', "Frequency(Hz)": Frecquency_default, "Amplitude(V)": Amplitude_default})
         st.session_state.constructed = logic.sinc_Interpolation(sample_rate, st.session_state.sum)
         sampled_time, sampled_signal, peroidic_time = logic.sampling(
             sample_rate, st.session_state.sum)
