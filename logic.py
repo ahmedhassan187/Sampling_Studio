@@ -7,11 +7,6 @@ import pandas as pd
 
 class logic:
     time = np.linspace(0,1,1000)
-    # signals_list = []
-    # def add_Sine(frequency,magnitude):
-    #     result = magnitude*np.sin(2*np.pi*logic.time*frequency)
-    #     logic.signals_List.append(result)
-
     def remove_Signal(index,signal_list):
         del signal_list[index]
         del st.session_state.sinW[index]
