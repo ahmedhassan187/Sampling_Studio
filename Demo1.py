@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sys
-from torch import empty
 from traitlets import default
 from logic import logic
 import matplotlib.pyplot as plt
@@ -58,6 +57,8 @@ if 'constructed' not in st.session_state:
     st.session_state.constructed = 0
 if 'deleted_flag ' not in st.session_state:
     st.session_state.deleted_flag = True
+
+
 @st.cache(allow_output_mutation=True)
 def get_data():
     return []
@@ -65,12 +66,17 @@ def get_data():
 
 fig = plt.figure()
 flag_noised = False
+Signal_Selected = st.selectbox(
+    "Select the Signal", ("Sampled Signal", "Recostructed Signal", "Both"))
+
 with st.sidebar:
 
     st.title('Sampling Studio')
-    with st.form(key = "my_form"):
+    with st.form(key="my_form"):
+
         Label = st.text_input("label")
-        col1, col2 = st.columns((1,1))
+
+        col1, col2 = st.columns((1, 1))
 
         with col1:
             freq = st.number_input("Frequency", step=1, min_value=1)
@@ -80,12 +86,12 @@ with st.sidebar:
     # Every form must have a submit button.
         submitted = st.form_submit_button("Add")
         if submitted:
-           logic.add_signals(Amplitude, freq)
-           st.session_state.sum = logic.sum_signals()
-           if Label == ""or Label == " ":
+            logic.add_signals(Amplitude, freq)
+            st.session_state.sum = logic.sum_signals()
+            if Label == "" or Label == " ":
                 Label = 'Signal' + str(st.session_state.label_generated)
                 st.session_state.label_generated += 1
-           get_data().append(
+            get_data().append(
                 {"Label": Label, "Frequency(Hz)": freq, "Amplitude(V)": Amplitude})    # col1, col2 = st.columns((1,1))
 
     # with col1:
@@ -106,14 +112,15 @@ with st.sidebar:
                 flag_noised = True
         else:
             flag_noised = True
-    if len(Signals)  == 0:
+    if len(Signals) == 0:
         delete_max = 0
     else:
         delete_max = len(Signals)-1
-    Deleted_Signal = st.number_input("Deleted row",step=1, min_value=0,max_value=delete_max)
+    Deleted_Signal = st.number_input(
+        "Deleted row", step=1, min_value=0, max_value=delete_max)
     delete_button = st.button('Delete')
     if delete_button:
-        if (int(Deleted_Signal) == 0) and (len(Signals)>1):
+        if (int(Deleted_Signal) == 0) and (len(Signals) > 1):
             st.session_state.deleted_flag = False
         if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
             st.text("Invalid number")
@@ -136,72 +143,6 @@ with st.sidebar:
         mime='text/csv',
     )
 
-    if Signals.empty:
-        st.write("")
-    else:
-        st.write(Signals)
-
-    st.write("")
-
-    # generate_expander = st.sidebar.expander(
-    #     "Add Signal ", expanded=False)
-    # Label = generate_expander.text_input("Label")
-    # freq = generate_expander.number_input(
-    #     "Frequency(Hz)", step=1, min_value=1)
-    # Amplitude = generate_expander.number_input(
-    #     "Amplitude(V)", step=1, min_value=1)
-    # Add_button_clicked = generate_expander.button("Add", key=1)
-
-    # if Add_button_clicked:
-
-      
-    #     logic.add_signals(Amplitude, freq)
-    #     st.session_state.sum = logic.sum_signals()
-    #     if Label == "" or Label == " ":
-    #         Label = 'Signal' + str(st.session_state.label_generated)
-    #         st.session_state.label_generated += 1
-    #     get_data().append(
-    #         {"Label": Label, "Frequency(Hz)": freq, "Amplitude(V)": Amplitude})
-
-    # generate_expander_Delete = st.sidebar.expander(
-    #     "Delete Signal ", expanded=False)
-
-    # Deleted_Signal = generate_expander_Delete.number_input(
-    #     "Signal Row", step=1, min_value=0)
-    # delete_button = generate_expander_Delete.button('Delete')
-    # if delete_button:
-    #     if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
-    #         st.text("Invalid number")
-    #     else:
-    #         logic.remove_Signal(int(Deleted_Signal), get_data())
-    #         Signals.drop([Deleted_Signal], axis=0, inplace=True)
-    #         if (len(Signals) == 0):
-    #             st.session_state.sum = 0
-    #             st.experimental_rerun()
-    #         else:
-    #             st.session_state.sum = logic.sum_signals()
-    #             st.experimental_rerun()
-
-    # generate_expander_Upload = st.sidebar.expander(
-    #     "Upload Signal", expanded=False)
-    
-    # if generate_expander_Upload.button(" Upload a Signal"):
-    #     Data = pd.read_csv(file)
-
-    # generate_expander_save = st.sidebar.expander(
-    #     "Save Signal", expanded=False)
-    # Folder_Name = generate_expander_save.text_input("Folder Name")
-
-    # csv = logic.save_File()
-    # save_button_clicked = generate_expander_save.download_button(
-    #     label="Save",
-    #     data=csv,
-    #     file_name=('{}.csv'.format(Folder_Name)),
-    #     mime='text/csv',
-    # )
-
-
-# sample_rate = st.slider("Sample Rate", 1, 30, step=1)
 
 col1, col2, col3 = st.columns(3)
 
@@ -221,8 +162,8 @@ with col3:
         pass
     else:
         if (st.session_state.deleted_flag):
-           st.session_state.amp[0] = Amplitude_default
-           st.session_state.sum = logic.sum_signals()
+            st.session_state.amp[0] = Amplitude_default
+            st.session_state.sum = logic.sum_signals()
 maxF = logic.get_maxF()
 if file is None:
     if type(st.session_state.sum) is np.ndarray:
@@ -234,12 +175,12 @@ if file is None:
             plt.subplot(211)
             fig_1, = plt.plot(logic.time, noised_signal,)
             fig_2, = plt.plot(sampled_time, sampled_signal,
-                     'o',)
+                              'o',)
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude(V)")
             plt.tight_layout()
             fig_3, = plt.plot(logic.time, st.session_state.constructed,
-                     label="Reconstructed Signals")
+                              label="Reconstructed Signals")
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude(V)")
             plt.legend(loc='upper right')
@@ -251,38 +192,41 @@ if file is None:
             plt.subplot(211)
             fig_1, = plt.plot(logic.time, st.session_state.sum)
             fig_2, = plt.plot(sampled_time, sampled_signal,
-                     'o')
+                              'o')
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude(V)")
             plt.tight_layout()
             fig_3, = plt.plot(logic.time, st.session_state.constructed,
-                     label="Reconstructed Signal")
+                              label="Reconstructed Signal")
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude")
             plt.legend(loc='upper right')
     else:
-        st.session_state.sum = Amplitude_default *np.sin(2*np.pi*Frecquency_default*logic.time)
+        st.session_state.sum = Amplitude_default * \
+            np.sin(2*np.pi*Frecquency_default*logic.time)
         st.session_state.freq.append(Frecquency_default)
         st.session_state.amp.append(Amplitude_default)
         st.session_state.sinW.append(
             Amplitude_default*np.sin(2*np.pi*Frecquency_default*logic.time))
         get_data().append(
             {"Label": 'Default Signal', "Frequency(Hz)": Frecquency_default, "Amplitude(V)": Amplitude_default})
-        st.session_state.constructed = logic.sinc_Interpolation(sample_rate, st.session_state.sum)
+        st.session_state.constructed = logic.sinc_Interpolation(
+            sample_rate, st.session_state.sum)
         sampled_time, sampled_signal, peroidic_time = logic.sampling(
             sample_rate, st.session_state.sum)
         plt.subplot(211)
         fig_1, = plt.plot(logic.time, Amplitude_default *
-                 np.sin(2*np.pi * Frecquency_default * logic.time))
+                          np.sin(2*np.pi * Frecquency_default * logic.time))
         fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
         plt.tight_layout()
         fig_3, = plt.plot(logic.time, st.session_state.constructed,
-                 label="Reconstructed Signal")
+                          label="Reconstructed Signal")
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
+        st.experimental_rerun()
 else:
     if flag_noised == False:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(
@@ -293,13 +237,13 @@ else:
             sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
         plt.subplot(211)
         fig_1, = plt.plot(time_of_uploaded, (signal_uploaded +
-                 st.session_state.sum))
+                                             st.session_state.sum))
         fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
         fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
-                 label="Reconstructed Signal")
+                          label="Reconstructed Signal")
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude")
         plt.legend(loc='upper right')
@@ -319,8 +263,16 @@ else:
         plt.ylabel("Amplitude(V)")
         plt.tight_layout()
         fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
-                 label="Reconstructed Signal")
+                          label="Reconstructed Signal")
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
 st.pyplot()
+
+
+if Signals.empty:
+
+    st.write("")
+else:
+    st.write(Signals)
+    st.write("")
