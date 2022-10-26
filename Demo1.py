@@ -67,7 +67,7 @@ def get_data():
 fig = plt.figure()
 flag_noised = False
 Signal_Selected = st.selectbox(
-    "Select the Signal", ("Sampled Signal", "Recostructed Signal", "Both"))
+    "Select the Signal", ("Sampled", "Recostructed", "Both"))
 
 with st.sidebar:
 
@@ -121,7 +121,7 @@ with st.sidebar:
     delete_button = st.button('Delete')
     if delete_button:
         if (int(Deleted_Signal) == 0) and (len(Signals) > 1):
-            st.session_state.deleted_flag = False
+            logic.default_signal_flag = False
         if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
             st.text("Invalid number")
         else:
@@ -129,7 +129,7 @@ with st.sidebar:
             Signals.drop([Deleted_Signal], axis=0, inplace=True)
             if (len(Signals) == 0):
                 st.session_state.sum = 0
-                # st.session_state.deleted_flag = True
+                logic.default_signal_flag = True
                 # st.experimental_rerun()
             else:
                 st.session_state.sum = logic.sum_signals()
@@ -154,14 +154,14 @@ with col2:
     if st.session_state.freq == []:
         pass
     else:
-        if (st.session_state.deleted_flag):
+        if (logic.default_signal_flag):
             st.session_state.freq[0] = Frecquency_default
 with col3:
     Amplitude_default = st.slider("Amplitude(V)", 1, 15, step=1)
     if st.session_state.amp == []:
         pass
     else:
-        if (st.session_state.deleted_flag):
+        if (logic.default_signal_flag):
             st.session_state.amp[0] = Amplitude_default
             st.session_state.sum = logic.sum_signals()
 maxF = logic.get_maxF()
@@ -181,9 +181,14 @@ if file is None:
             plt.tight_layout()
             fig_3, = plt.plot(logic.time, st.session_state.constructed,
                               label="Reconstructed Signals")
+            print(Signal_Selected)
+            if Signal_Selected == "Sampled":
+                fig_3.remove()
+            elif Signal_Selected == "Reconstructed":
+                fig_1.remove()
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude(V)")
-            plt.legend(loc='upper right')
+            # plt.legend(loc='upper right')
         else:
             st.session_state.constructed = logic.sinc_Interpolation(
                 sample_rate, st.session_state.sum)
@@ -198,9 +203,13 @@ if file is None:
             plt.tight_layout()
             fig_3, = plt.plot(logic.time, st.session_state.constructed,
                               label="Reconstructed Signal")
+            if Signal_Selected == "Sampled":
+                fig_3.remove()
+            elif Signal_Selected == "Reconstructed":
+                fig_1.remove()
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude")
-            plt.legend(loc='upper right')
+            # plt.legend(loc='upper right')
     else:
         st.session_state.sum = Amplitude_default * \
             np.sin(2*np.pi*Frecquency_default*logic.time)
@@ -223,6 +232,10 @@ if file is None:
         plt.tight_layout()
         fig_3, = plt.plot(logic.time, st.session_state.constructed,
                           label="Reconstructed Signal")
+        if Signal_Selected == "Sampled":
+                fig_3.remove()
+        elif Signal_Selected == "Reconstructed":
+                fig_1.remove()
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
@@ -241,12 +254,16 @@ else:
         fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
-        plt.legend(loc='upper right')
+        # plt.legend(loc='upper right')
         fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
                           label="Reconstructed Signal")
+        if Signal_Selected == "Sampled":
+                fig_3.remove()
+        elif Signal_Selected == "Reconstructed":
+                fig_1.remove()
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude")
-        plt.legend(loc='upper right')
+        # plt.legend(loc='upper right')
 
     else:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(
@@ -264,9 +281,15 @@ else:
         plt.tight_layout()
         fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
                           label="Reconstructed Signal")
+        if Signal_Selected == "Sampled":
+                fig_3.remove()
+        elif Signal_Selected == "Reconstructed":
+                fig_1.remove()
+        else:
+            fig_2.remove()
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
-        plt.legend(loc='upper right')
+        # plt.legend(loc='upper right')
 st.pyplot()
 
 

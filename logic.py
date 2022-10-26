@@ -4,9 +4,11 @@ import scipy
 from scipy import signal
 import streamlit as st
 import pandas as pd
+from traitlets import default
 
 class logic:
     time = np.linspace(0,1,1000)
+    default_signal_flag = True
     def remove_Signal(index,signal_list):
         del signal_list[index]
         del st.session_state.sinW[index]
