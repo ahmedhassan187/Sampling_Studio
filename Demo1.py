@@ -67,7 +67,7 @@ def get_data():
 fig = plt.figure()
 flag_noised = False
 Signal_Selected = st.selectbox(
-    "Select the Signal", ("Sampled", "Recostructed", "Both"))
+    "Select the Signal", ("Sampled", "Reconstructed", "Both"))
 
 with st.sidebar:
 
@@ -181,7 +181,6 @@ if file is None:
             plt.tight_layout()
             fig_3, = plt.plot(logic.time, st.session_state.constructed,
                               label="Reconstructed Signals")
-            print(Signal_Selected)
             if Signal_Selected == "Sampled":
                 fig_3.remove()
             elif Signal_Selected == "Reconstructed":
