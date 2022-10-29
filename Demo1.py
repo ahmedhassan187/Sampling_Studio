@@ -12,6 +12,8 @@ st.set_page_config(
     page_icon="chart_with_upwards_trend",
     # layout='wide'
 )
+
+
 reduce_header_height_style = """
     <style>
         div.block-container {padding-top:0rem;}
@@ -19,7 +21,11 @@ reduce_header_height_style = """
 """
 st.markdown(reduce_header_height_style, unsafe_allow_html=True)
 
-# st.session_state.label_generated = 0
+
+
+st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: left;} </style>', unsafe_allow_html=True)
+#st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
+
 
 if 'label_generated' not in st.session_state:
     st.session_state.label_generated = 0
@@ -66,8 +72,15 @@ def get_data():
 
 fig = plt.figure()
 flag_noised = False
-Signal_Selected = st.selectbox(
-    "Select the Signal", ("Sampled", "Reconstructed", "Both"))
+
+col4 , col5 = st.columns((1,2))
+
+with col4 :
+    Signal_Selected = st.selectbox(
+        "Select the Signal", ("Sampled", "Reconstructed", "Both"))
+
+with col5 :
+    sample_option = st.radio("Sample Rate option" , ["Sample Rate" , "Max Freq Scale"])
 
 with st.sidebar:
 
@@ -143,11 +156,19 @@ with st.sidebar:
         mime='text/csv',
     )
 
+    st.write("")
 
-col1, col2, col3 = st.columns(3)
+maxF = logic.get_maxF()
+
+col1, col2 , col3 = st.columns(3)
 
 with col1:
-    sample_rate = st.slider("Sample Rate", 1, 60, step=1)
+    if sample_option == "Sample Rate" :
+        sample_rate = st.slider("Sample Rate", 1, 60, step=1)
+
+    if sample_option == "Max Freq Scale" :
+        fmax_scale = st.slider("Max Freq Scale", 1, 20, step=1)
+        sample_rate = fmax_scale * maxF
 
 with col2:
     Frecquency_default = st.slider("Frequency(HZ)", 1, 30, step=1)
@@ -156,6 +177,7 @@ with col2:
     else:
         if (logic.default_signal_flag):
             st.session_state.freq[0] = Frecquency_default
+
 with col3:
     Amplitude_default = st.slider("Amplitude(V)", 1, 15, step=1)
     if st.session_state.amp == []:
@@ -164,7 +186,7 @@ with col3:
         if (logic.default_signal_flag):
             st.session_state.amp[0] = Amplitude_default
             st.session_state.sum = logic.sum_signals()
-maxF = logic.get_maxF()
+
 if file is None:
     if type(st.session_state.sum) is np.ndarray:
         if flag_noised:
@@ -261,7 +283,7 @@ else:
         elif Signal_Selected == "Reconstructed":
                 fig_1.remove()
         plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude")
+        plt.ylabel("Amplitude(V)")
         # plt.legend(loc='upper right')
 
     else:
