@@ -1,3 +1,4 @@
+from platform import mac_ver
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -139,14 +140,14 @@ with st.sidebar:
             st.text("Invalid number")
         else:
             logic.remove_Signal(int(Deleted_Signal), get_data())
+            if  Signals['Label'][Deleted_Signal] == "Uploaded":
+                logic.uploaded_flag = True
             Signals.drop([Deleted_Signal], axis=0, inplace=True)
             if (len(Signals) == 0):
                 st.session_state.sum = 0
                 logic.default_signal_flag = True
-                # st.experimental_rerun()
             else:
                 st.session_state.sum = logic.sum_signals()
-                # st.experimental_rerun()
     Folder_Name = st.text_input("Folder Name")
     csv = logic.save_File()
     save_button_clicked = st.download_button(
@@ -165,7 +166,6 @@ col1, col2 , col3 = st.columns(3)
 with col1:
     if sample_option == "Sample Rate" :
         sample_rate = st.slider("Sample Rate", 1, 60, step=1)
-
     if sample_option == "Max Freq Scale" :
         fmax_scale = st.slider("Max Freq Scale", 1, 20, step=1)
         sample_rate = fmax_scale * maxF
@@ -209,7 +209,6 @@ if file is None:
                 fig_1.remove()
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude(V)")
-            # plt.legend(loc='upper right')
         else:
             st.session_state.constructed = logic.sinc_Interpolation(
                 sample_rate, st.session_state.sum)
@@ -230,7 +229,6 @@ if file is None:
                 fig_1.remove()
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude")
-            # plt.legend(loc='upper right')
     else:
         st.session_state.sum = Amplitude_default * \
             np.sin(2*np.pi*Frecquency_default*logic.time)
@@ -265,27 +263,34 @@ else:
     if flag_noised == False:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(
             file)
-        st.session_state.constructed = logic.sinc_Interpolation_uploaded(
+        maxF = max_frequency
+        if len(time_of_uploaded) == 1000:
+            st.session_state.constructed = logic.sinc_Interpolation_uploaded(
+                sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
+            sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
             sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
-        sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
-            sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
-        plt.subplot(211)
-        fig_1, = plt.plot(time_of_uploaded, (signal_uploaded +
+            if logic.uploaded_flag:
+                logic.add_signals(1, max_frequency)
+                get_data().append(
+                    {"Label": "Uploaded", "Frequency(Hz)": max_frequency, "Amplitude(V)": 1})
+                logic.uploaded_flag = False
+                st.experimental_rerun()
+            plt.subplot(211)
+            fig_1, = plt.plot(time_of_uploaded, (signal_uploaded +
                                              st.session_state.sum))
-        fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
-        plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude(V)")
-        # plt.legend(loc='upper right')
-        fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
+            fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
+            plt.xlabel("Time(sec)")
+            plt.ylabel("Amplitude(V)")
+            fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
                           label="Reconstructed Signal")
-        if Signal_Selected == "Sampled":
+            if Signal_Selected == "Sampled":
                 fig_3.remove()
-        elif Signal_Selected == "Reconstructed":
+            elif Signal_Selected == "Reconstructed":
                 fig_1.remove()
-        plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude(V)")
-        # plt.legend(loc='upper right')
-
+            plt.xlabel("Time(sec)")
+            plt.ylabel("Amplitude(V)")
+        else:
+            st.warning("File size not supported")
     else:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(
             file)
@@ -294,6 +299,12 @@ else:
             sample_rate, noised_signal, time_of_uploaded)
         sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
             sample_rate, noised_signal, time_of_uploaded)
+        if logic.uploaded_flag:
+                logic.add_signals(1, max_frequency)
+                get_data().append(
+                    {"Label": "Uploaded", "Frequency(Hz)": max_frequency, "Amplitude(V)": 1})  
+                logic.uploaded_flag = False
+                st.experimental_rerun()
         plt.subplot(211)
         fig_1, = plt.plot(time_of_uploaded, noised_signal,)
         fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
