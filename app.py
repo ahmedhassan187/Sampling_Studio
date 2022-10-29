@@ -23,8 +23,8 @@ reduce_header_height_style = """
 st.markdown(reduce_header_height_style, unsafe_allow_html=True)
 
 
-
-st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: left;} </style>', unsafe_allow_html=True)
+st.write(
+    '<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: left;} </style>', unsafe_allow_html=True)
 #st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
 
 
@@ -74,14 +74,15 @@ def get_data():
 fig = plt.figure()
 flag_noised = False
 
-col4 , col5 = st.columns((1,2))
+col4, col5 = st.columns((1, 2))
 
-with col4 :
+with col4:
     Signal_Selected = st.selectbox(
         "Select the Signal", ("Sampled", "Reconstructed", "Both"))
 
-with col5 :
-    sample_option = st.radio("Sample Rate option" , ["Sample Rate" , "Max Freq Scale"])
+with col5:
+    sample_option = st.radio("Sample Rate option", [
+                             "Sample Rate", "Max Freq Scale"])
 
 with st.sidebar:
 
@@ -115,7 +116,7 @@ with st.sidebar:
     #     Amplitude = st.number_input("Amplitude", step=1, min_value=1)
 
     Signals = pd.DataFrame(get_data())
-    file = st.file_uploader("Upload")
+    file = st.file_uploader("Upload", type=["csv"])
     if st.checkbox("Add Noise"):
         snr = st.slider("SNR", 1, 100, step=1)
         if file is None:
@@ -130,9 +131,17 @@ with st.sidebar:
         delete_max = 0
     else:
         delete_max = len(Signals)-1
-    Deleted_Signal = st.number_input(
-        "Deleted row", step=1, min_value=0, max_value=delete_max)
-    delete_button = st.button('Delete')
+    col6, col7 = st.columns((1, 1))
+
+    with col6:
+        Deleted_Signal = st.number_input(
+            "Deleted row", step=1, min_value=0, max_value=delete_max)
+
+    with col7:
+        st.write("")
+        st.write("")
+
+        delete_button = st.button('Delete')
     if delete_button:
         if (int(Deleted_Signal) == 0) and (len(Signals) > 1):
             logic.default_signal_flag = False
@@ -140,7 +149,7 @@ with st.sidebar:
             st.text("Invalid number")
         else:
             logic.remove_Signal(int(Deleted_Signal), get_data())
-            if  Signals['Label'][Deleted_Signal] == "Uploaded":
+            if Signals['Label'][Deleted_Signal] == "Uploaded":
                 logic.uploaded_flag = True
             Signals.drop([Deleted_Signal], axis=0, inplace=True)
             if (len(Signals) == 0):
@@ -148,12 +157,13 @@ with st.sidebar:
                 logic.default_signal_flag = True
             else:
                 st.session_state.sum = logic.sum_signals()
-    Folder_Name = st.text_input("Folder Name")
+
+    st.write("")
     csv = logic.save_File()
     save_button_clicked = st.download_button(
-        label="Save",
+        label="Download",
         data=csv,
-        file_name=('{}.csv'.format(Folder_Name)),
+        file_name=('Signal.csv'),
         mime='text/csv',
     )
 
@@ -161,12 +171,12 @@ with st.sidebar:
 
 maxF = logic.get_maxF()
 
-col1, col2 , col3 = st.columns(3)
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    if sample_option == "Sample Rate" :
+    if sample_option == "Sample Rate":
         sample_rate = st.slider("Sample Rate", 1, 60, step=1)
-    if sample_option == "Max Freq Scale" :
+    if sample_option == "Max Freq Scale":
         fmax_scale = st.slider("Max Freq Scale", 1, 20, step=1)
         sample_rate = fmax_scale * maxF
 
@@ -252,9 +262,9 @@ if file is None:
         fig_3, = plt.plot(logic.time, st.session_state.constructed,
                           label="Reconstructed Signal")
         if Signal_Selected == "Sampled":
-                fig_3.remove()
+            fig_3.remove()
         elif Signal_Selected == "Reconstructed":
-                fig_1.remove()
+            fig_1.remove()
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
         plt.legend(loc='upper right')
@@ -268,7 +278,7 @@ else:
             st.session_state.constructed = logic.sinc_Interpolation_uploaded(
                 sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
             sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
-            sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
+                sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
             if logic.uploaded_flag:
                 logic.add_signals(1, max_frequency)
                 get_data().append(
@@ -277,12 +287,12 @@ else:
                 st.experimental_rerun()
             plt.subplot(211)
             fig_1, = plt.plot(time_of_uploaded, (signal_uploaded +
-                                             st.session_state.sum))
+                                                 st.session_state.sum))
             fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude(V)")
             fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
-                          label="Reconstructed Signal")
+                              label="Reconstructed Signal")
             if Signal_Selected == "Sampled":
                 fig_3.remove()
             elif Signal_Selected == "Reconstructed":
@@ -300,11 +310,11 @@ else:
         sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
             sample_rate, noised_signal, time_of_uploaded)
         if logic.uploaded_flag:
-                logic.add_signals(1, max_frequency)
-                get_data().append(
-                    {"Label": "Uploaded", "Frequency(Hz)": max_frequency, "Amplitude(V)": 1})  
-                logic.uploaded_flag = False
-                st.experimental_rerun()
+            logic.add_signals(1, max_frequency)
+            get_data().append(
+                {"Label": "Uploaded", "Frequency(Hz)": max_frequency, "Amplitude(V)": 1})
+            logic.uploaded_flag = False
+            st.experimental_rerun()
         plt.subplot(211)
         fig_1, = plt.plot(time_of_uploaded, noised_signal,)
         fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
@@ -314,9 +324,9 @@ else:
         fig_3, = plt.plot(time_of_uploaded, st.session_state.constructed,
                           label="Reconstructed Signal")
         if Signal_Selected == "Sampled":
-                fig_3.remove()
+            fig_3.remove()
         elif Signal_Selected == "Reconstructed":
-                fig_1.remove()
+            fig_1.remove()
         else:
             fig_2.remove()
         plt.xlabel("Time(sec)")

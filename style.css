@@ -21,3 +21,15 @@ font-size: 20px;
   padding-left: 1rem;
   padding-right: 1rem;
 }
+
+section.css-1dhfpht.css-1dhfpht{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+section.css-163ttbj.e1fqkh3o10{
+  max-width:380px;
+  min-width:350px;
+
+}
