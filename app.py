@@ -53,10 +53,10 @@ if 'sinW' not in st.session_state:
     st.session_state.sinW = []
 
 if 'amp' not in st.session_state:
-    st.session_state.amp = [1]
+    st.session_state.amp = []
 
 if 'freq' not in st.session_state:
-    st.session_state.freq = [1]
+    st.session_state.freq = []
 
 if 'sum' not in st.session_state:
     st.session_state.sum = logic.sum_signals()
@@ -83,7 +83,15 @@ with col4:
 with col5:
     sample_option = st.radio("Sample Rate option", [
                              "Sample Rate", "Max Frequency Scale"])
-
+    if logic.default_signal_flag:
+        st.session_state.sum = 1 *np.sin(2*np.pi*2*logic.time)
+        st.session_state.freq.append(2)
+        st.session_state.amp.append(1)
+        st.session_state.sinW.append(
+            1*np.sin(2*np.pi*2*logic.time))
+        get_data().append(
+            {"Label": 'Default Signal', "Frequency(Hz)": 2, "Amplitude(V)": 1})
+        logic.default_signal_flag = False
 with st.sidebar:
 
     st.title('Sampling Studio')
@@ -119,10 +127,12 @@ with st.sidebar:
                 flag_noised = True
         else:
             flag_noised = True
-    if len(Signals) == 0:
-        delete_max = 0
-    else:
-        delete_max = len(Signals)-1
+        
+    # if len(Signals) == 0:
+    #     delete_max = 0
+    # else:
+    #     delete_max = len(Signals)-1
+    
     col6, col7 = st.columns((1, 1))
 
     with col6:
@@ -164,10 +174,6 @@ with st.sidebar:
     st.write("")
 
 maxF = logic.get_maxF()
-
-#col1, col2, col3 = st.columns(3)
-
-
 if sample_option == "Sample Rate":
     sample_rate = st.slider("Sample Rate", 1, 60, step=1)
 if sample_option == "Max Frequency Scale":
@@ -233,36 +239,36 @@ if file is None:
                 fig_1.remove()
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude")
-    else:
-        st.session_state.sum = 1 * \
-            np.sin(2*np.pi*2*logic.time)
-        st.session_state.freq.append(2)
-        st.session_state.amp.append(1)
-        st.session_state.sinW.append(
-            1*np.sin(2*np.pi*2*logic.time))
-        get_data().append(
-            {"Label": 'Default Signal', "Frequency(Hz)": 2, "Amplitude(V)": 1})
-        st.session_state.constructed = logic.sinc_Interpolation(
-            sample_rate, st.session_state.sum)
-        sampled_time, sampled_signal, peroidic_time = logic.sampling(
-            sample_rate, st.session_state.sum)
-        plt.subplot(211)
-        fig_1, = plt.plot(logic.time, 1 *
-                          np.sin(2*np.pi * 2 * logic.time))
-        fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
-        plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude(V)")
-        plt.tight_layout()
-        fig_3, = plt.plot(logic.time, st.session_state.constructed,
-                          label="Reconstructed Signal")
-        if Signal_Selected == "Sampled":
-            fig_3.remove()
-        elif Signal_Selected == "Reconstructed":
-            fig_1.remove()
-        plt.xlabel("Time(sec)")
-        plt.ylabel("Amplitude(V)")
-        plt.legend(loc='upper right')
-        st.experimental_rerun()
+    # else:
+        # st.session_state.sum = 1 * \
+        #     np.sin(2*np.pi*2*logic.time)
+        # st.session_state.freq.append(2)
+        # st.session_state.amp.append(1)
+        # st.session_state.sinW.append(
+        #     1*np.sin(2*np.pi*2*logic.time))
+        # get_data().append(
+        #     {"Label": 'Default Signal', "Frequency(Hz)": 2, "Amplitude(V)": 1})
+        # st.session_state.constructed = logic.sinc_Interpolation(
+        #     sample_rate, st.session_state.sum)
+        # sampled_time, sampled_signal, peroidic_time = logic.sampling(
+        #     sample_rate, st.session_state.sum)
+        # plt.subplot(211)
+        # fig_1, = plt.plot(logic.time, 1 *
+        #                   np.sin(2*np.pi * 2 * logic.time))
+        # fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
+        # plt.xlabel("Time(sec)")
+        # plt.ylabel("Amplitude(V)")
+        # plt.tight_layout()
+        # fig_3, = plt.plot(logic.time, st.session_state.constructed,
+        #                   label="Reconstructed Signal")
+        # if Signal_Selected == "Sampled":
+        #     fig_3.remove()
+        # elif Signal_Selected == "Reconstructed":
+        #     fig_1.remove()
+        # plt.xlabel("Time(sec)")
+        # plt.ylabel("Amplitude(V)")
+        # plt.legend(loc='upper right')
+        # st.experimental_rerun()
 else:
     if flag_noised == False:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(

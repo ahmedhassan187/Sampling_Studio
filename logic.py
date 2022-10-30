@@ -1,4 +1,3 @@
-from distutils.command.upload import upload
 import numpy as np 
 import matplotlib.pyplot as plt
 import scipy 
@@ -65,8 +64,8 @@ class logic:
             this function takes three parameters of uploaded file and returns the signal of the sampled points after sinc interploation  
         """
         t_Points,y_Points,T = logic.sampling_uploaded(sample_Frequency,original_Signal,time)
-        [Ts,timee] = np.meshgrid(t_Points,logic.time,indexing='ij')
-        y = np.sinc((timee-Ts)/T)*y_Points
+        [T_sample,time_of_signal] = np.meshgrid(t_Points,logic.time,indexing='ij')
+        y = np.sinc((time_of_signal-T_sample)/T)*y_Points
         y_new = 0
         for i in range(sample_Frequency):
             y_new += y[i,:]
@@ -78,8 +77,8 @@ class logic:
             this function takes three parameters of uploaded file and returns the signal of the sampled points after sinc interploation  
         """
         t_Points,y_Points,T = logic.sampling(sample_Frequency,original_Signal)
-        [Ts,timee] = np.meshgrid(t_Points,logic.time,indexing='ij')
-        y = np.sinc((timee-Ts)/T)*y_Points
+        [T_sample,time_of_signal] = np.meshgrid(t_Points,logic.time,indexing='ij')
+        y = np.sinc((time_of_signal-T_sample)/T)*y_Points
         y_new = 0
         for i in range(sample_Frequency):
             y_new += y[i,:]
