@@ -82,7 +82,7 @@ with col4:
 
 with col5:
     sample_option = st.radio("Sample Rate option", [
-                             "Sample Rate", "Max Freq Scale"])
+                             "Sample Rate", "Max Frequency Scale"])
 
 with st.sidebar:
 
@@ -176,12 +176,12 @@ col1, col2, col3 = st.columns(3)
 with col1:
     if sample_option == "Sample Rate":
         sample_rate = st.slider("Sample Rate", 1, 60, step=1)
-    if sample_option == "Max Freq Scale":
-        fmax_scale = st.slider("Max Freq Scale", 1, 20, step=1)
+    if sample_option == "Max Frequency Scale":
+        fmax_scale = st.slider("Max Frequency Scale", 1, 20, step=1)
         sample_rate = fmax_scale * maxF
 
 with col2:
-    Frecquency_default = st.slider("Frequency(HZ)", 1, 30, step=1)
+    Frecquency_default = st.slider("Frequency(Hz)", 1, 30, step=1)
     if st.session_state.freq == []:
         pass
     else:
