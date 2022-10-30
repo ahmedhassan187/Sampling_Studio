@@ -34,7 +34,9 @@ To deploy this project run
 
 - Sampling an added signal without noise
 
-![2](https://user-images.githubusercontent.com/81927516/198858843-be6dbc31-e45c-45f1-9872-62a1ef6edda2.png) ![3](https://user-images.githubusercontent.com/81927516/198858846-6f32ec74-6cb7-4075-9c47-5f79d1d884fd.png)
+![2](https://user-images.githubusercontent.com/81927516/198858843-be6dbc31-e45c-45f1-9872-62a1ef6edda2.png)
+
+![3](https://user-images.githubusercontent.com/81927516/198858846-6f32ec74-6cb7-4075-9c47-5f79d1d884fd.png)
 
 - Sampling an added signal with noise
 
@@ -46,11 +48,9 @@ To deploy this project run
 
 Insert gif or link to demo
 
-### About Us
+## About Us
 
-# Team Number : 21
-
-## Team Membera
+### Team Members
 
 Name| Section | Bench Number |
 --- | --- | --- |
@@ -58,3 +58,5 @@ Habiba Fathallah | 1 | 27
 Sohaila Mahmoud Hussein | 1 | 45
 Ahmed Hassan | 1 | 4
 Sara Amgad | 1 | 38
+
+### Team Number : 21
