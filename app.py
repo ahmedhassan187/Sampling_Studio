@@ -11,7 +11,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(
     page_title='Sampling Studio',
     page_icon="chart_with_upwards_trend",
-    # layout='wide'
+
 )
 
 
@@ -25,7 +25,7 @@ st.markdown(reduce_header_height_style, unsafe_allow_html=True)
 
 st.write(
     '<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: left;} </style>', unsafe_allow_html=True)
-#st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
+
 
 
 if 'label_generated' not in st.session_state:
@@ -98,7 +98,6 @@ with st.sidebar:
 
         with col2:
             Amplitude = st.number_input("Amplitude", step=1, min_value=1)
-    # Every form must have a submit button.
         submitted = st.form_submit_button("Add")
         if submitted:
             logic.add_signals(Amplitude, freq)
@@ -107,14 +106,7 @@ with st.sidebar:
                 Label = 'Signal' + str(st.session_state.label_generated)
                 st.session_state.label_generated += 1
             get_data().append(
-                {"Label": Label, "Frequency(Hz)": freq, "Amplitude(V)": Amplitude})    # col1, col2 = st.columns((1,1))
-
-    # with col1:
-    #     freq = st.number_input("Frequency", step=1, min_value=1)
-
-    # with col2:
-    #     Amplitude = st.number_input("Amplitude", step=1, min_value=1)
-
+                {"Label": Label, "Frequency(Hz)": freq, "Amplitude(V)": Amplitude})
     Signals = pd.DataFrame(get_data())
     file = st.file_uploader("Upload", type=["csv"])
     if st.checkbox("Add Noise"):
@@ -275,19 +267,19 @@ else:
             file)
         maxF = max_frequency
         if len(time_of_uploaded) == 1000:
-            st.session_state.constructed = logic.sinc_Interpolation_uploaded(
-                sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
-            sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
-                sample_rate, (signal_uploaded+st.session_state.sum), time_of_uploaded)
             if logic.uploaded_flag:
                 logic.add_signals(1, max_frequency)
                 get_data().append(
                     {"Label": "Uploaded", "Frequency(Hz)": max_frequency, "Amplitude(V)": 1})
                 logic.uploaded_flag = False
-                st.experimental_rerun()
+                st.session_state.sum = logic.sum_signals()
+                # st.experimental_rerun()
+            st.session_state.constructed = logic.sinc_Interpolation_uploaded(
+                sample_rate, (st.session_state.sum), time_of_uploaded)
+            sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
+                sample_rate, (st.session_state.sum), time_of_uploaded)
             plt.subplot(211)
-            fig_1, = plt.plot(time_of_uploaded, (signal_uploaded +
-                                                 st.session_state.sum))
+            fig_1, = plt.plot(time_of_uploaded, (st.session_state.sum))
             fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude(V)")
@@ -331,7 +323,6 @@ else:
             fig_2.remove()
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
-        # plt.legend(loc='upper right')
 st.pyplot()
 
 
