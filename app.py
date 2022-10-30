@@ -53,13 +53,13 @@ if 'sinW' not in st.session_state:
     st.session_state.sinW = []
 
 if 'amp' not in st.session_state:
-    st.session_state.amp = []
+    st.session_state.amp = [1]
 
 if 'freq' not in st.session_state:
-    st.session_state.freq = []
+    st.session_state.freq = [1]
 
 if 'sum' not in st.session_state:
-    st.session_state.sum = 0
+    st.session_state.sum = logic.sum_signals()
 if 'constructed' not in st.session_state:
     st.session_state.constructed = 0
 if 'deleted_flag ' not in st.session_state:
@@ -74,7 +74,7 @@ def get_data():
 fig = plt.figure()
 flag_noised = False
 
-col4, col5 = st.columns((1, 2))
+col4, col5 = st.columns((2, 1))
 
 with col4:
     Signal_Selected = st.selectbox(
@@ -126,15 +126,17 @@ with st.sidebar:
     col6, col7 = st.columns((1, 1))
 
     with col6:
-        Deleted_Signal = st.number_input(
-            "Deleted row", step=1, min_value=0, max_value=delete_max)
-
+        Deleted_Signal_name = st.selectbox(
+            "Signals",Signals)
     with col7:
         st.write("")
         st.write("")
 
         delete_button = st.button('Delete')
     if delete_button:
+        for i in range(0,len(Signals)):
+            if Deleted_Signal_name == Signals['Label'][i] :
+                Deleted_Signal = i
         if (int(Deleted_Signal) == 0) and (len(Signals) > 1):
             logic.default_signal_flag = False
         if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
@@ -149,7 +151,7 @@ with st.sidebar:
                 logic.default_signal_flag = True
             else:
                 st.session_state.sum = logic.sum_signals()
-
+        st.experimental_rerun()
     st.write("")
     csv = logic.save_File()
     save_button_clicked = st.download_button(
@@ -163,31 +165,31 @@ with st.sidebar:
 
 maxF = logic.get_maxF()
 
-col1, col2, col3 = st.columns(3)
+#col1, col2, col3 = st.columns(3)
 
-with col1:
-    if sample_option == "Sample Rate":
-        sample_rate = st.slider("Sample Rate", 1, 60, step=1)
-    if sample_option == "Max Frequency Scale":
-        fmax_scale = st.slider("Max Frequency Scale", 1, 20, step=1)
-        sample_rate = fmax_scale * maxF
 
-with col2:
-    Frecquency_default = st.slider("Frequency(Hz)", 1, 30, step=1)
-    if st.session_state.freq == []:
-        pass
-    else:
-        if (logic.default_signal_flag):
-            st.session_state.freq[0] = Frecquency_default
+if sample_option == "Sample Rate":
+    sample_rate = st.slider("Sample Rate", 1, 60, step=1)
+if sample_option == "Max Frequency Scale":
+    fmax_scale = st.slider("Max Frequency Scale", 1, 20, step=1)
+    sample_rate = fmax_scale * maxF
 
-with col3:
-    Amplitude_default = st.slider("Amplitude(V)", 1, 15, step=1)
-    if st.session_state.amp == []:
-        pass
-    else:
-        if (logic.default_signal_flag):
-            st.session_state.amp[0] = Amplitude_default
-            st.session_state.sum = logic.sum_signals()
+# with col2:
+#     Frecquency_default = st.slider("Frequency(Hz)", 1, 30, step=1)
+#     if st.session_state.freq == []:
+#         pass
+#     else:
+#         if (logic.default_signal_flag):
+#             st.session_state.freq[0] = Frecquency_default
+
+# with col3:
+#     Amplitude_default = st.slider("Amplitude(V)", 1, 15, step=1)
+#     if st.session_state.amp == []:
+#         pass
+#     else:
+#         if (logic.default_signal_flag):
+#             st.session_state.amp[0] = Amplitude_default
+#             st.session_state.sum = logic.sum_signals()
 
 if file is None:
     if type(st.session_state.sum) is np.ndarray:
@@ -232,21 +234,21 @@ if file is None:
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude")
     else:
-        st.session_state.sum = Amplitude_default * \
-            np.sin(2*np.pi*Frecquency_default*logic.time)
-        st.session_state.freq.append(Frecquency_default)
-        st.session_state.amp.append(Amplitude_default)
+        st.session_state.sum = 1 * \
+            np.sin(2*np.pi*2*logic.time)
+        st.session_state.freq.append(2)
+        st.session_state.amp.append(1)
         st.session_state.sinW.append(
-            Amplitude_default*np.sin(2*np.pi*Frecquency_default*logic.time))
+            1*np.sin(2*np.pi*2*logic.time))
         get_data().append(
-            {"Label": 'Default Signal', "Frequency(Hz)": Frecquency_default, "Amplitude(V)": Amplitude_default})
+            {"Label": 'Default Signal', "Frequency(Hz)": 2, "Amplitude(V)": 1})
         st.session_state.constructed = logic.sinc_Interpolation(
             sample_rate, st.session_state.sum)
         sampled_time, sampled_signal, peroidic_time = logic.sampling(
             sample_rate, st.session_state.sum)
         plt.subplot(211)
-        fig_1, = plt.plot(logic.time, Amplitude_default *
-                          np.sin(2*np.pi * Frecquency_default * logic.time))
+        fig_1, = plt.plot(logic.time, 1 *
+                          np.sin(2*np.pi * 2 * logic.time))
         fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
@@ -326,9 +328,5 @@ else:
 st.pyplot()
 
 
-if Signals.empty:
 
-    st.write("")
-else:
-    st.write(Signals)
-    st.write("")
+ 
