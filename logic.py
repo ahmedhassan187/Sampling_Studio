@@ -11,7 +11,7 @@ class logic:
     sample_rate = 1
     sample_edit_flag = False
     def remove_Signal(index,signal_list):
-        """ index : take index of item you wnt to delete
+        """ index : take index of item you want to delete
             signal_list : list of signals that you want to delete"""
         if(index > len(signal_list)-1):
             pass

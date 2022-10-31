@@ -130,31 +130,31 @@ with st.sidebar:
         else:
             flag_noised = True
         
-    # if len(Signals) == 0:
-    #     delete_max = 0
-    # else:
-    #     delete_max = len(Signals)-1
+
     
     col6, col7 = st.columns((1, 1))
 
     with col6:
-        
         Deleted_Signal_name = st.selectbox(
             "Signals",Signals)
+    for i in range(0,len(Signals)):
+        if Deleted_Signal_name == Signals['Label'][i] :
+                Deleted_Signal = i
+    st.write(f"Frequnecy =  {get_data()[Deleted_Signal]['Frequency(Hz)']}Hz")
+        
     with col7:
         st.write("")
         st.write("")
-
         delete_button = st.button('Delete')
     if delete_button:
-        for i in range(0,len(Signals)):
+       for i in range(0,len(Signals)):
             if Deleted_Signal_name == Signals['Label'][i] :
                 Deleted_Signal = i
-        if (int(Deleted_Signal) == 0) and (len(Signals) > 1):
+       if (int(Deleted_Signal) == 0) and (len(Signals) > 1):
             logic.default_signal_flag = False
-        if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
+       if Deleted_Signal > len(Signals)-1 or Deleted_Signal < 0:
             st.text("Invalid number")
-        else:
+       else:
             logic.remove_Signal(int(Deleted_Signal), get_data())
             if Signals['Label'][Deleted_Signal] == "Uploaded":
                 logic.uploaded_flag = True
@@ -162,6 +162,7 @@ with st.sidebar:
             if (len(Signals) == 0):
                 st.session_state.sum = 0
                 logic.default_signal_flag = True
+                st.experimental_rerun()
             else:
                 st.session_state.sum = logic.sum_signals()
         # logic.sample_rate = st.session_state.sample_rate
@@ -182,22 +183,6 @@ if sample_option == "Sample Rate":
 if sample_option == "Max Frequency Scale":
     fmax_scale = st.slider("Max Frequency Scale", 1, 20, step=1)
     st.session_state.sample_rate = fmax_scale * maxF
-# with col2:
-#     Frecquency_default = st.slider("Frequency(Hz)", 1, 30, step=1)
-#     if st.session_state.freq == []:
-#         pass
-#     else:
-#         if (logic.default_signal_flag):
-#             st.session_state.freq[0] = Frecquency_default
-
-# with col3:
-#     Amplitude_default = st.slider("Amplitude(V)", 1, 15, step=1)
-#     if st.session_state.amp == []:
-#         pass
-#     else:
-#         if (logic.default_signal_flag):
-#             st.session_state.amp[0] = Amplitude_default
-#             st.session_state.sum = logic.sum_signals()
 
 if file is None:
     if type(st.session_state.sum) is np.ndarray:
@@ -241,36 +226,7 @@ if file is None:
                 fig_1.remove()
             plt.xlabel("Time(sec)")
             plt.ylabel("Amplitude")
-    # else:
-        # st.session_state.sum = 1 * \
-        #     np.sin(2*np.pi*2*logic.time)
-        # st.session_state.freq.append(2)
-        # st.session_state.amp.append(1)
-        # st.session_state.sinW.append(
-        #     1*np.sin(2*np.pi*2*logic.time))
-        # get_data().append(
-        #     {"Label": 'Default Signal', "Frequency(Hz)": 2, "Amplitude(V)": 1})
-        # st.session_state.constructed = logic.sinc_Interpolation(
-        #     sample_rate, st.session_state.sum)
-        # sampled_time, sampled_signal, peroidic_time = logic.sampling(
-        #     sample_rate, st.session_state.sum)
-        # plt.subplot(211)
-        # fig_1, = plt.plot(logic.time, 1 *
-        #                   np.sin(2*np.pi * 2 * logic.time))
-        # fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
-        # plt.xlabel("Time(sec)")
-        # plt.ylabel("Amplitude(V)")
-        # plt.tight_layout()
-        # fig_3, = plt.plot(logic.time, st.session_state.constructed,
-        #                   label="Reconstructed Signal")
-        # if Signal_Selected == "Sampled":
-        #     fig_3.remove()
-        # elif Signal_Selected == "Reconstructed":
-        #     fig_1.remove()
-        # plt.xlabel("Time(sec)")
-        # plt.ylabel("Amplitude(V)")
-        # plt.legend(loc='upper right')
-        # st.experimental_rerun()
+
 else:
     if flag_noised == False:
         time_of_uploaded, signal_uploaded, max_frequency = logic.open_File(
