@@ -64,6 +64,8 @@ if 'constructed' not in st.session_state:
     st.session_state.constructed = 0
 if 'deleted_flag ' not in st.session_state:
     st.session_state.deleted_flag = True
+if 'sample_rate' not in st.session_state:
+    st.session_state.sample_rate = 1
 
 
 @st.cache(allow_output_mutation=True)
@@ -136,6 +138,7 @@ with st.sidebar:
     col6, col7 = st.columns((1, 1))
 
     with col6:
+        
         Deleted_Signal_name = st.selectbox(
             "Signals",Signals)
     with col7:
@@ -161,7 +164,7 @@ with st.sidebar:
                 logic.default_signal_flag = True
             else:
                 st.session_state.sum = logic.sum_signals()
-        st.experimental_rerun()
+        # logic.sample_rate = st.session_state.sample_rate
     st.write("")
     csv = logic.save_File()
     save_button_clicked = st.download_button(
@@ -175,11 +178,10 @@ with st.sidebar:
 
 maxF = logic.get_maxF()
 if sample_option == "Sample Rate":
-    sample_rate = st.slider("Sample Rate", 1, 60, step=1)
+    st.session_state.sample_rate = st.slider("Sample Rate", 1, 60, step=1)
 if sample_option == "Max Frequency Scale":
     fmax_scale = st.slider("Max Frequency Scale", 1, 20, step=1)
-    sample_rate = fmax_scale * maxF
-
+    st.session_state.sample_rate = fmax_scale * maxF
 # with col2:
 #     Frecquency_default = st.slider("Frequency(Hz)", 1, 30, step=1)
 #     if st.session_state.freq == []:
@@ -201,9 +203,9 @@ if file is None:
     if type(st.session_state.sum) is np.ndarray:
         if flag_noised:
             st.session_state.constructed = logic.sinc_Interpolation(
-                sample_rate, noised_signal)
+                st.session_state.sample_rate, noised_signal)
             sampled_time, sampled_signal, peroidic_time = logic.sampling(
-                sample_rate, noised_signal)
+                st.session_state.sample_rate, noised_signal)
             plt.subplot(211)
             fig_1, = plt.plot(logic.time, noised_signal,)
             fig_2, = plt.plot(sampled_time, sampled_signal,
@@ -221,9 +223,9 @@ if file is None:
             plt.ylabel("Amplitude(V)")
         else:
             st.session_state.constructed = logic.sinc_Interpolation(
-                sample_rate, st.session_state.sum)
+                st.session_state.sample_rate, st.session_state.sum)
             sampled_time, sampled_signal, peroidic_time = logic.sampling(
-                sample_rate, st.session_state.sum)
+                st.session_state.sample_rate, st.session_state.sum)
             plt.subplot(211)
             fig_1, = plt.plot(logic.time, st.session_state.sum)
             fig_2, = plt.plot(sampled_time, sampled_signal,
@@ -283,9 +285,9 @@ else:
                 st.session_state.sum = logic.sum_signals()
                 # st.experimental_rerun()
             st.session_state.constructed = logic.sinc_Interpolation_uploaded(
-                sample_rate, (st.session_state.sum), time_of_uploaded)
+                st.session_state.sample_rate, (st.session_state.sum), time_of_uploaded)
             sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
-                sample_rate, (st.session_state.sum), time_of_uploaded)
+                st.session_state.sample_rate, (st.session_state.sum), time_of_uploaded)
             plt.subplot(211)
             fig_1, = plt.plot(time_of_uploaded, (st.session_state.sum))
             fig_2, = plt.plot(sampled_time, sampled_signal, 'o')
@@ -306,9 +308,9 @@ else:
             file)
         noised_signal = logic.add_noise(signal_uploaded, snr)
         st.session_state.constructed = logic.sinc_Interpolation_uploaded(
-            sample_rate, noised_signal, time_of_uploaded)
+            st.session_state.sample_rate, noised_signal, time_of_uploaded)
         sampled_time, sampled_signal, peroidic_time = logic.sampling_uploaded(
-            sample_rate, noised_signal, time_of_uploaded)
+            st.session_state.sample_rate, noised_signal, time_of_uploaded)
         if logic.uploaded_flag:
             logic.add_signals(1, max_frequency)
             get_data().append(

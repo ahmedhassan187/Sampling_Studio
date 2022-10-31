@@ -8,6 +8,8 @@ class logic:
     time = np.linspace(0,1,1000)
     default_signal_flag = True
     uploaded_flag = True
+    sample_rate = 1
+    sample_edit_flag = False
     def remove_Signal(index,signal_list):
         """ index : take index of item you wnt to delete
             signal_list : list of signals that you want to delete"""
