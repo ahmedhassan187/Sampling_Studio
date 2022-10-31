@@ -60,6 +60,6 @@ To deploy this project run
 Name| Section | Bench Number |
 --- | --- | --- |
 Habiba Fathallah | 1 | 27
-Sohaila Mahmoud Hussein | 1 | 45
+Sohaila Mahmoud | 1 | 45
 Ahmed Hassan | 1 | 4
 Sara Amgad | 1 | 38
