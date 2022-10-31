@@ -7,12 +7,12 @@ Designing a signal recovery web-application that depicts the Nyquist rate, using
 ## Features
 - generating sinusoidal signals at the user-specified frequency and amplitude.
 - Reading of csv signal files and the sampled points are marked on the signal.
-- Adjusting the sample rate through a slider that ranges from 0 Hz to  Hz.
+- Adjusting the sample frequency with sample rate slider or slider of maximum frequency scale.
 - Reconstructing the signal from the sampled points.
-- The sum of the generated sinusoidals is shown on a single graph.
+- The sum of the generated sinusoidals, and the reconstructed ones are shown on a single graph, where user can choose which to be shown.
 - A button to delete the user-choosen sinusoidal.
 - A slider for adding noise to the signal by a user-specified SNR value.
-- Saving the generated sinusoidal to the user's computer using save button.
+- Saving the reconstructed signal to the user's computer using download button.
 
 ## Deployment
 
@@ -46,7 +46,7 @@ To deploy this project run
 
 ## Demo
 
-Insert gif or link to demo
+![Uploading SamplingStudio.gif…]()
 
 ## About Us
 
