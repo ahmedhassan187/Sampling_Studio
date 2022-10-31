@@ -46,9 +46,14 @@ To deploy this project run
 
 ## Demo
 
-![Uploading SamplingStudio.gif…]()
+![SamplingStudio](https://user-images.githubusercontent.com/81927516/199120894-87641f6c-56cf-4c1b-be19-eeef1151b3ea.gif)
+
 
 ## About Us
+
+- This project was made for a task in the fifth semester of SBME, for digital signal processing course, and was submitted to the course's doctor in 10/31/2022
+
+### Team Number : 21
 
 ### Team Members
 
@@ -58,5 +63,3 @@ Habiba Fathallah | 1 | 27
 Sohaila Mahmoud Hussein | 1 | 45
 Ahmed Hassan | 1 | 4
 Sara Amgad | 1 | 38
-
-### Team Number : 21
