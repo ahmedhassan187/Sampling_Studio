@@ -1,8 +1,8 @@
-﻿streamlit
- pandas 
- numpy
- matplotlib.pyplot
- altair==4.2.0
+streamlit
+pandas 
+numpy
+matplotlib.pyplot
+altair==4.2.0
 asgiref==3.5.2
 asttokens==2.0.5
 attrs==22.1.0
