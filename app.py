@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import sys
-from traitlets import default
 from logic import logic
 import matplotlib.pyplot as plt
 
