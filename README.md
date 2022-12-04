@@ -23,7 +23,7 @@ To deploy this project run
 ```
 
 ```bash
-  streamlit run Demo1.py
+  streamlit run app.py
 ```
 
 ## Screenshots
