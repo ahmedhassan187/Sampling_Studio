@@ -290,7 +290,3 @@ else:
         plt.xlabel("Time(sec)")
         plt.ylabel("Amplitude(V)")
 st.pyplot()
-
-
-
- 
